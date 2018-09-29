@@ -3,7 +3,13 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.26228.4
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "mealplanner", "mealplanner.csproj", "{76DE16FB-8A9E-4FD9-B0AB-CCB40F6A26BA}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MealPlanner.Data", "MealPlanner.Data\MealPlanner.Data.csproj", "{76DE16FB-8A9E-4FD9-B0AB-CCB40F6A26BA}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MealPlanner.Web", "MealPlanner.Web\MealPlanner.Web.csproj", "{08F33353-30FB-48C6-A1FE-61F68091BA36}"
+EndProject
+Project("{E53339B2-1760-4266-BCC7-CA923CBCF16C}") = "docker-compose", "docker-compose.dcproj", "{498F4447-9CF6-497F-9D9C-BAB8CA927EB8}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MealPlanner.Tests", "MealPlanner.Tests\MealPlanner.Tests.csproj", "{8B48B781-E274-46B9-A818-31BC1123C7A3}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,8 +21,23 @@ Global
 		{76DE16FB-8A9E-4FD9-B0AB-CCB40F6A26BA}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{76DE16FB-8A9E-4FD9-B0AB-CCB40F6A26BA}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{76DE16FB-8A9E-4FD9-B0AB-CCB40F6A26BA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{08F33353-30FB-48C6-A1FE-61F68091BA36}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{08F33353-30FB-48C6-A1FE-61F68091BA36}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{08F33353-30FB-48C6-A1FE-61F68091BA36}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{08F33353-30FB-48C6-A1FE-61F68091BA36}.Release|Any CPU.Build.0 = Release|Any CPU
+		{498F4447-9CF6-497F-9D9C-BAB8CA927EB8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{498F4447-9CF6-497F-9D9C-BAB8CA927EB8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{498F4447-9CF6-497F-9D9C-BAB8CA927EB8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{498F4447-9CF6-497F-9D9C-BAB8CA927EB8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8B48B781-E274-46B9-A818-31BC1123C7A3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8B48B781-E274-46B9-A818-31BC1123C7A3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8B48B781-E274-46B9-A818-31BC1123C7A3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8B48B781-E274-46B9-A818-31BC1123C7A3}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {CA3EF64E-26E7-4984-BA3C-DCA7526C659A}
 	EndGlobalSection
 EndGlobal

@@ -1,18 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using mealplanner.elastic;
+using MealPlanner.Data.Elastic;
+using MealPlanner.Data.Repositories;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.SpaServices.Webpack;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Logging;
-using Nest;
+using System;
 using Umi.Core;
+using Elastic = MealPlanner.Data.Repositories.Elastic;
 
 namespace mealplanner
 {
@@ -33,7 +30,14 @@ namespace mealplanner
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            var elasticEndpoint = new Uri("http://localhost:9200/").RegisterAsEndpoint(config =>
+            {
+                config.Category = "ElasticSearch";
+            });
+
             services.TryAddSingleton<IHttpContextAccessor, HttpContextAccessor>();
+            services.TryAddSingleton<ElasticService>(s => new ElasticService(elasticEndpoint));
+            services.TryAddTransient<IIngredientRepository, Elastic.IngredientRepository>();
             // Umi for urls
             services.AddUmi();
             // Add framework services.
@@ -42,29 +46,11 @@ namespace mealplanner
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory)
-        {  
-            var elasticEndpoint = new Uri("http://localhost:9200/").RegisterAsEndpoint(config => {
-                        config.Category = "ElasticSearch"; 
-                    });
-            var setting = new ConnectionSettings(elasticEndpoint); 
-                    
-            DataModelV1.Setup(new ElasticClient(setting));
+        {
             loggerFactory.AddConsole(Configuration.GetSection("Logging"));
             loggerFactory.AddDebug();
 
-            if (env.IsDevelopment())
-            {
-                app.UseDeveloperExceptionPage();
-                app.UseWebpackDevMiddleware(new WebpackDevMiddlewareOptions
-                {
-                    HotModuleReplacement = true
-                });
-            }
-            else
-            {
-                app.UseExceptionHandler("/Home/Error");
-            }
-
+            app.UseExceptionHandler("/Home/Error");
             app.UseStaticFiles();
             app.UseUmi();
             app.UseMvc(routes =>
@@ -78,6 +64,6 @@ namespace mealplanner
                     defaults: new { controller = "Home", action = "Index" });
             });
         }
- 
+
     }
 }

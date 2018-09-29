@@ -1,6 +1,7 @@
 using System;
 
-namespace mealplanner {
+namespace MealPlanner.Data.Models
+{
     [Flags]
     public enum MealType
     {

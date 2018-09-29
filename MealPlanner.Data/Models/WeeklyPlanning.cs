@@ -1,6 +1,6 @@
 using System;
 
-namespace mealplanner.Models
+namespace MealPlanner.Data.Models
 {
     public class WeeklyPlanning
     {

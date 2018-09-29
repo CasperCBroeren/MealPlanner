@@ -1,23 +1,26 @@
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
-using mealplanner.Models;
-using Nest; 
-
-using Client = ElasticEndpoint;
+using MealPlanner.Data.Models;
+using MealPlanner.Data.Repositories;
 
 namespace mealplanner.Controllers
 {
     [Route("api/[controller]")]
     public class MealController : Controller
-    {  
+    {
+        private IMealRepository mealRepository;
+
+        public MealController(IMealRepository mealRepository)
+        {
+            this.mealRepository = mealRepository;
+        }
+
         [HttpGet("[action]")]
         public async Task<ActionResult> All()
-        {    
-            var items = await Client.Instance.SearchAsync<Meal>(s => s.MatchAll().Index(Client.MealIndexName));
-            return Ok(items.Documents.ToList()); 
+        {
+            var items = await this.mealRepository.All();
+            return Ok(items); 
         }
 
         [HttpPost("[action]")]
@@ -27,9 +30,8 @@ namespace mealplanner.Controllers
             {
                 var isDuplicate = false;
                 if (!item.Created.HasValue)
-                {
-                    var checkExisting = await Client.Instance.SearchAsync<Meal>(q => q.Query(rq => rq.Term(t => t.ExactName, item.Name)).Index(Client.MealIndexName));
-                    var existingItem = checkExisting.Documents.FirstOrDefault();
+                { 
+                    var existingItem = await this.mealRepository.FindOneByName(item.Name);
                     if (existingItem == null)
                     {
                         item.Created = DateTime.Now;
@@ -39,9 +41,9 @@ namespace mealplanner.Controllers
                         isDuplicate = true;
                         item.Created = existingItem.Created;
                     }
-                } 
-                
-                var result = await Client.Instance.IndexDocumentAsync(item);
+                }
+
+                var result = await this.mealRepository.Save(item);
                 return Ok( new {
                                 created = item.Created,
                                 isDuplicate = isDuplicate
@@ -54,8 +56,8 @@ namespace mealplanner.Controllers
         [HttpPost("[action]")]
         public async Task<ActionResult> Delete([FromBody] Meal item)
         {
-            var result = await Client.Instance.DeleteByQueryAsync<Meal>(q => q.Query(rq => rq.Term(t => t.Created, item.Created)));
-            return Ok(result.Deleted > 0 ? "done": "nochange");
+            var result = await this.mealRepository.Delete(item);
+            return Ok(result ? "done": "nochange");
         }
     }
 

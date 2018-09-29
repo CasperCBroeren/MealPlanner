@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using Nest;
 
-namespace mealplanner.Models
+namespace MealPlanner.Data.Models
 {
     [ElasticsearchType(Name="meal", IdProperty="Created")]
     public class Meal
