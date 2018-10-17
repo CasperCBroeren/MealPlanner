@@ -42,26 +42,10 @@ namespace mealplanner.Controllers
         public async Task<ActionResult> Save([FromBody] Ingredient item)
         {
             if (!string.IsNullOrWhiteSpace(item.Name))
-            {
-                var isDuplicate = false;
-                if (!item.Uid.HasValue)
-                { 
-                    var existingItem = await this.ingredientRepository.FindSingleByName(item.Name);
-                    if (existingItem == null)
-                    {
-                        item.Uid = Guid.NewGuid();
-                    }
-                    else 
-                    {
-                        isDuplicate = true;
-                        item.Uid = existingItem.Uid;
-                    }
-                }
-
+            {  
                 var result = await this.ingredientRepository.Save(item);
                 return Ok( new {
-                                uid = item.Uid,
-                                isDuplicate = isDuplicate,
+                                id = item.Id, 
                                 item = item
                                 });
             }

@@ -1,4 +1,4 @@
-﻿<template>
+<template>
         <div class="container">
   <div class="row">
     <div class="col-sm">     
@@ -10,15 +10,15 @@
               Naam:
             </label> 
             <input type="text" name="ingredientName" id="ingredientName" v-model="editItem.name" placeholder="zonder meervoud" autocomplete="off" />
-            <input type="button" value="Verwijder" v-if="editItem.uid" v-on:click="deleteIngredient()" />
+            <input type="button" value="Verwijder" v-if="editItem.id" v-on:click="deleteIngredient()" />
             <input type="submit" value="Opslaan" />
-            <input type="button" value="x" v-if="editItem.uid" v-on:click="cancel()" />
+            <input type="button" value="x" v-if="editItem.id" v-on:click="cancel()" />
         </form>  
 
         <p v-if="!ingredients"><em>Laden...</em></p>
 
         <ul class="ingredientsCollection" v-if="ingredients">
-            <li v-for="item in ingredients" v-on:click="edit(item)" v-bind:key="item.uid">
+            <li v-for="item in ingredients" v-on:click="edit(item)" v-bind:key="item.id">
                     {{ item.name }} 
              </li> 
         </ul> 
@@ -33,7 +33,7 @@ export default {
         return {
             editItem:  {
                 name: "",
-                uid: null
+                id: null
             },
             ingredients: null
         }
@@ -44,7 +44,7 @@ export default {
         {
             this.editItem = {
                 name: "",
-                uid: null
+                id: null
             }; 
         },
         edit: function(item)
@@ -58,9 +58,9 @@ export default {
                 let response = await this.$http.post('/api/Ingredients/Save', this.editItem);
                 if (response.data != "nope")
                 {
-                    if (response.data.uid != this.editItem.uid && response.data.isDuplicate == false)
+                    if (response.data.id != this.editItem.id )
                     { 
-                        this.editItem.uid = response.data.uid;
+                        this.editItem.id = response.data.id;
                         this.ingredients.push(this.editItem);
                     }
                 }
@@ -80,10 +80,10 @@ export default {
     },
 
     async created() {
-        
+         
         try {
             let response = await this.$http.get('/api/Ingredients/All')
-            console.log(response.data);
+            
             this.ingredients = response.data;
         } catch (error) {
             console.log(error)
@@ -92,4 +92,3 @@ export default {
     }
 }
 </script>
- 

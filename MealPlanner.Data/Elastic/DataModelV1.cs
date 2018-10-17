@@ -30,7 +30,7 @@ namespace MealPlanner.Data.Elastic
                         c.Mappings( ms => ms.Map<Ingredient>(
                             m => m.Properties(ps => ps
                                                       .Keyword( s=> s.Name( e=> e.Name).Fields( ff=> ff.Completion(cc => cc.Name("name_suggester"))))
-                                                      .Keyword( s=> s.Name( e=> e.Uid))
+                                                      .Keyword( s=> s.Name( e=> e.Id))
                             )
                         ))
                         .Settings(s => s.Analysis(a =>  

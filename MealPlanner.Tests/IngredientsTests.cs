@@ -2,6 +2,7 @@ using MealPlanner.Data.Elastic;
 using MealPlanner.Data.Repositories.Elastic;
 using Shouldly;
 using System;
+using System.Linq;
 using System.Threading.Tasks;
 using Xunit;
 
@@ -22,7 +23,7 @@ namespace MealPlanner.Tests
             await repo.Save(new Data.Models.Ingredient() { Name = "televisie" });
             
             var items = await repo.FindAllByName("e");
-            items.Count.ShouldBe(2);
+            items.ToList().Count.ShouldBe(2);
         }
     }
 }

@@ -14,23 +14,26 @@
 </template>
 
 <script>
-import Vue from 'vue'
-import Meals from './meals'
-import Ingredients from './ingredients'
-import HomePage from './home-page'
-import NavMenu from './nav-menu'
+    import Vue from 'vue'
+    import Autocomplete from './autocomplete'
+    import Meals from './meals'
+    import Ingredients from './ingredients'
+    import HomePage from './home-page'
+    import NavMenu from './nav-menu'
 
-Vue.component('meals', Meals);
-Vue.component('ingredients', Ingredients);
-Vue.component('home-page', HomePage);
-Vue.component('nav-menu', NavMenu);
 
-export default {
-    data() {
-        return {
+    Vue.component('autocomplete', Autocomplete);
+    Vue.component('meals', Meals);
+    Vue.component('ingredients', Ingredients);
+    Vue.component('home-page', HomePage);
+    Vue.component('nav-menu', NavMenu);
+
+    export default {
+        data() {
+            return {
+            }
         }
     }
-}
 </script>
 
 <style>

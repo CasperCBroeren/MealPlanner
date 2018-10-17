@@ -66,26 +66,28 @@
 }
 
 /* site wide styling */
+.tagCollection,
 .ingredientsCollection {
     list-style-type: none;
   }
-  .ingredientsCollection li {
-    display:  inline-block; 
-    background-color:  #aaa;
-    padding: 0.25% 2.5%;
-    margin: 0.25% 0.5%;
-    font-variant: small-caps;
-    cursor: pointer;
-    font-weight: bold;
-  }
-
-  .ingredientsCollection li a {
-      border: 0px solid black;
-      background-color: #aaa;
-      color: #333;
-     padding: 1px 4px;
-     position: inline-block;
-  }
+    .tagCollection li,
+    .ingredientsCollection li {
+        display: inline-block;
+        background-color: #aaa;
+        padding: 0.25% 2.5%;
+        margin: 0.25% 0.5%;
+        font-variant: small-caps;
+        cursor: pointer;
+        font-weight: bold;
+    }
+        .tagCollection li a,
+        .ingredientsCollection li a {
+            border: 0px solid black;
+            background-color: #aaa;
+            color: #333;
+            padding: 1px 4px;
+            position: inline-block;
+        }
   .form textarea 
   {
       width: 100%;

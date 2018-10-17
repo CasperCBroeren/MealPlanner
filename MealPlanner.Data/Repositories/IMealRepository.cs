@@ -6,7 +6,7 @@ namespace MealPlanner.Data.Repositories
 {
     public interface IMealRepository
     {
-        Task<IList<Meal>> All();
+        Task<IEnumerable<Meal>> All();
 
         Task<Meal> FindOneByName(string name);
 

@@ -1,0 +1,145 @@
+<template>
+    <div class="autocomplete">
+        <input type="text" v-model="search" autocomplete="off" class="form-control"
+               v-on:keydown.down="onArrowDown"
+               v-on:keydown.up="onArrowUp"
+               v-on:keydown.enter="onEnter"
+               v-on:input="onChange" />
+        <ul class="autocomplete-results" v-show="isOpen">
+            <li class="loading" v-if="isLoading">
+                Laden....
+            </li>
+            <li v-else v-for="(result, i) in results"
+                :key="i"
+                :class="{ 'is-active': i === arrowCounter }"
+                @click="setResult(result)">
+                {{ result.value }}
+            </li>
+        </ul>
+    </div>
+</template>
+<script>
+    export default {
+        name: 'autocomplete',
+        props: {
+            isAsync: {
+                type: Boolean,
+                required: false,
+                default: false
+            }, 
+            items: {
+                type: Array,
+                required: false,
+                default: () => [],
+            },
+        },
+        data() {
+            return {
+                search: '',
+                results: [],
+                isOpen: false,
+                isLoading: false,
+                arrowCounter: 0,
+            };
+        },
+        methods: {
+            handleClickOutside(evt) {
+                if (!this.$el.contains(evt.target)) {
+                    this.isOpen = false;
+                    this.arrowCounter = -1;
+                }
+            },
+            onArrowDown() {
+                if (this.arrowCounter < this.results.length) {
+                    this.arrowCounter = this.arrowCounter + 1;
+                }
+            },
+            onArrowUp() {
+                if (this.arrowCounter > 0) {
+                    this.arrowCounter = this.arrowCounter - 1;
+                }
+            },
+            onEnter() {
+                if (this.isOpen) {
+                    this.search = this.results[this.arrowCounter].value;
+                    this.isOpen = false;
+                    this.arrowCounter = -1;
+                }
+                else {
+                    this.$emit('keydown-enter', this.search);
+                    this.search = null;
+                }
+            },
+            setResult(item) {
+                this.search = item.value;
+                this.isOpen = false;
+                this.arrowCounter = -1;
+            },
+            onChange() {
+                this.$emit('lookup', this.search); 
+                if (this.isAsync) {
+                    this.isLoading = true;
+                }
+                else {
+                    this.isOpen = true;
+                    this.filterResults();
+                }
+            },
+            filterResults() {
+                this.results = this.items.filter(item => item.toLowerCase().indexOf(this.search.toLowerCase()) > -1);
+            }
+        },
+        watch: {
+            items: function (value, oldValue) {
+                if (this.isAsync) {
+                    this.results = value;
+                    if (this.results.length > 0) {
+                        this.isOpen = true;
+                        this.isLoading = false;
+                    }
+                    else {
+                        this.isOpen = false;
+                        this.isLoading = true;
+                    }
+                    
+                }
+            }
+        },
+        mounted() {
+            document.addEventListener('click', this.handleClickOutside)
+        },
+        destroyed() {
+            document.removeEventListener('click', this.handleClickOutside)
+        }
+
+    };
+</script>
+<style>
+    .autocomplete {
+        position: relative;
+    }
+
+    .autocomplete-results {
+        padding: 0;
+        margin: 0;
+        border: 1px solid #eeeeee;
+        height: 120px;
+        position: absolute;
+        width: 100%;
+        background: #fff;
+    }
+
+        .autocomplete-results li {
+            list-style: none;
+            text-align: left;
+            padding: 4px 2px;
+            cursor: pointer;
+        }
+
+
+            .autocomplete-results li.is-active,
+            .autocomplete-results li:hover {
+                background-color: #ddd;
+                color: #000;
+            }
+</style>

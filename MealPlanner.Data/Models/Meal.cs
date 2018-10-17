@@ -3,39 +3,24 @@ using System.Collections.Generic;
 using Nest;
 
 namespace MealPlanner.Data.Models
-{
-    [ElasticsearchType(Name="meal", IdProperty="Created")]
+{ 
     public class Meal
     {
         public Meal()
         {
              this.Created = DateTime.Now;
-             this.Ingredients = new List<Ingredient>();
-
-             this.IngredientsAmount = new List<int>();
-             this.Tags = new List<string>();
+             this.Ingredients = new List<IngredientAmount>();
+             
+             this.Tags = new List<Tag>();
         }
 
-    
-        private string _name;
+        public int? Id { get; set; }
 
-        [Text(Name = "name", Analyzer="autocomplete")]
-        public string Name { get {return _name; } set {
-            _name = value; 
-        }} 
+        public string Name { get; set; }
 
-        [Keyword()]
-        public string ExactName { get {
-            return _name;
-        } set {
-            _name = value;
-        }}
-
-        public List<Ingredient> Ingredients { get; }
-
-        public List<int> IngredientsAmount{get;}
-
-        public List<string> Tags { get; }
+        public List<IngredientAmount> Ingredients { get; }
+         
+        public List<Tag> Tags { get; }
         public MealType MealType { get; set; }
 
         public string Description { get; set;}

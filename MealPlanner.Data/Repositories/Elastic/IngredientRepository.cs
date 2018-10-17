@@ -16,7 +16,7 @@ namespace MealPlanner.Data.Repositories.Elastic
         {
             this.elasticService = elasticService;
         }
-        public async Task<IList<Ingredient>> All()
+        public async Task<IEnumerable<Ingredient>> All()
         {
             var result = await elasticService.Client.SearchAsync<Ingredient>(s =>
                                                                  s.MatchAll()
@@ -27,11 +27,11 @@ namespace MealPlanner.Data.Repositories.Elastic
 
         public async Task<bool> Delete(Ingredient item)
         {
-            var result = await this.elasticService.Client.DeleteByQueryAsync<Ingredient>(q => q.Query(rq => rq.Term(t => t.Uid, item.Uid)));
+            var result = await this.elasticService.Client.DeleteByQueryAsync<Ingredient>(q => q.Query(rq => rq.Term(t => t.Id, item.Id)));
             return result.Deleted > 0;
         }
 
-        public async Task<IList<Ingredient>> FindAllByName(string name)
+        public async Task<IEnumerable<Ingredient>> FindAllByName(string name)
         {
             var item = await this.elasticService.Client.SearchAsync<Ingredient>(s => s.Suggest(q => q.Term("name_suggester",
                 t => t 
@@ -50,6 +50,15 @@ namespace MealPlanner.Data.Repositories.Elastic
 
         public async Task<bool> Save(Ingredient item)
         {
+            if (!item.Id.HasValue)
+            {
+                var existingItem = await this.FindSingleByName(item.Name);
+                if (existingItem == null)
+                {
+                    item.Id = System.Environment.TickCount;
+                }
+                
+            }
             var result = await this.elasticService.Client.IndexDocumentAsync<Ingredient>(item);
             return result.Result == Nest.Result.Created || result.Result == Nest.Result.Updated;
         }

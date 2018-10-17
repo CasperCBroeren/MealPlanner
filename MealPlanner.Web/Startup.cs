@@ -1,15 +1,14 @@
-using MealPlanner.Data.Elastic;
 using MealPlanner.Data.Repositories;
+using MealPlanner.Data.Repositories.Dapper;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.SpaServices.Webpack;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Logging;
-using System;
-using Umi.Core;
-using Elastic = MealPlanner.Data.Repositories.Elastic;
+using Umi.Core;  
 
 namespace mealplanner
 {
@@ -19,8 +18,11 @@ namespace mealplanner
         {
             var builder = new ConfigurationBuilder()
                 .SetBasePath(env.ContentRootPath)
+                .AddJsonFile("config.json", optional: true, reloadOnChange: true)
+
                 .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
                 .AddJsonFile($"appsettings.{env.EnvironmentName}.json", optional: true)
+
                 .AddEnvironmentVariables();
             Configuration = builder.Build();
         }
@@ -30,14 +32,13 @@ namespace mealplanner
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            var elasticEndpoint = new Uri("http://localhost:9200/").RegisterAsEndpoint(config =>
-            {
-                config.Category = "ElasticSearch";
-            });
+            var connectionString = Configuration.GetValue<string>("dbConnectionString"); 
 
             services.TryAddSingleton<IHttpContextAccessor, HttpContextAccessor>();
-            services.TryAddSingleton<ElasticService>(s => new ElasticService(elasticEndpoint));
-            services.TryAddTransient<IIngredientRepository, Elastic.IngredientRepository>();
+
+            services.TryAddTransient<ITagRepository>(s => new TagRepository(connectionString));
+            services.TryAddTransient<IIngredientRepository>(s => new IngredientRepository(connectionString));
+            services.TryAddTransient<IMealRepository>(s => new MealRepository(connectionString, s.GetService<ITagRepository>()));
             // Umi for urls
             services.AddUmi();
             // Add framework services.
@@ -49,8 +50,19 @@ namespace mealplanner
         {
             loggerFactory.AddConsole(Configuration.GetSection("Logging"));
             loggerFactory.AddDebug();
+            if (env.IsDevelopment())
+            {
+                app.UseDeveloperExceptionPage();
+                app.UseWebpackDevMiddleware(new WebpackDevMiddlewareOptions
+                {
+                    HotModuleReplacement = true
+                });
+            }
+            else
+            {
+                app.UseExceptionHandler("/Home/Error");
+            }
 
-            app.UseExceptionHandler("/Home/Error");
             app.UseStaticFiles();
             app.UseUmi();
             app.UseMvc(routes =>

@@ -15,7 +15,7 @@ namespace MealPlanner.Data.Repositories.Elastic
             this.elasticService = elasticService;
         }
 
-        public async Task<IList<Meal>> All()
+        public async Task<IEnumerable<Meal>> All()
         {
             var items = await this.elasticService.Client.SearchAsync<Meal>(s => s.MatchAll().Index(ElasticService.MealIndexName));
             return items.Documents.ToList();
@@ -29,7 +29,7 @@ namespace MealPlanner.Data.Repositories.Elastic
 
         public async Task<Meal> FindOneByName(string name)
         { 
-            var item = await this.elasticService.Client.SearchAsync<Meal>(s => s.Query(q => q.Term(t => t.ExactName, name)).Index(ElasticService.MealIndexName));
+            var item = await this.elasticService.Client.SearchAsync<Meal>(s => s.Query(q => q.Term(t => t.Name, name)).Index(ElasticService.MealIndexName));
             return item.Documents.Count > 0 ? item.Documents.First() : null;
         }
 
