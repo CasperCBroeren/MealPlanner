@@ -61,7 +61,11 @@
                         <label for="mealIngredients">
                             Ingrediënten:
                         </label>
-                        <input type="text" class="form-control" name="mealIngredients" id="mealIngredients" v-model="ingredientSearchFor" autocomplete="off" v-on:keydown="addIngredient" />
+                        <autocomplete :items="ingredientsOptions" name="mealIngredients" id="mealIngredients" 
+                                      v-on:keydown-enter="addIngredient"
+                                      v-on:lookup="lookupIngredients"
+                                      itemValueProperty="name"
+                                      isAsync /> 
                         <span v-if="ingredientToAdd">
                             Dit ingrediënt bestaat niet, wil je het toevoegen? <button v-on:click="registerNewIngredientAndAdd">Ok</button>
                         </span>
@@ -134,13 +138,25 @@
                 meals: null,
                 ingredientSearchFor: null,
                 ingredientToAdd: null,
-                tagsOptions: []
+                tagsOptions: [],
+                ingredientsOptions: []
             }
         },
         filters: {
 
         },
         methods: {
+            lookupIngredients: async function (val) {
+                if (val.length > 0) {
+                    let response = await this.$http.get('/api/Ingredients/search/' + encodeURI(val));
+                    if (response.data != null) {
+                        this.ingredientsOptions = response.data;
+                    }
+                }
+                else {
+                    this.ingredientsOptions = [];
+                }
+            },
             lookupTags: async function (val) {
                 if (val.length > 0) {
                     let response = await this.$http.get('/api/Tag/find/' + encodeURI(val));
@@ -161,6 +177,7 @@
             registerNewIngredientAndAdd: async function () {
                 let response = await this.$http.post('/api/Ingredients/Save', this.ingredientToAdd);
                 if (response.data != "nope") {
+                    response.data.item.amount = 1;
                     this.editItem.ingredients.push(response.data.item);
                 }
                 this.ingredientToAdd = null;
@@ -196,28 +213,26 @@
                 this.tagSearchFor = null;
 
             },
-            addIngredient: async function (ev) {
-                this.ingredientToAdd = null;
-                if (ev.keyCode == 13) {
+            addIngredient: async function (value) {
+                console.log(value + " add");
                     try {
-                        let response = await this.$http.get('/api/Ingredients/Find/' + this.ingredientSearchFor);
+                        let response = await this.$http.get('/api/Ingredients/Find/' + value);
 
                         if (response.data && this.filterValue(this.editItem.ingredients, "id", response.data.uid) == null) {
                             response.data.amount = 1;
                             this.editItem.ingredients.push(response.data);
-                        }
-                        this.ingredientSearchFor = null;
+                        } 
                     }
                     catch (error) {
 
                         if (error.response != null && error.response.status == 404) {
                             this.ingredientToAdd = {
-                                name: this.ingredientSearchFor
+                                name: value,
+                                amount: 1
                             }
                         }
                     }
-
-                }
+                
             },
             renderIngredients: function (items) {
                 if (!items || items.length == 0) return "";

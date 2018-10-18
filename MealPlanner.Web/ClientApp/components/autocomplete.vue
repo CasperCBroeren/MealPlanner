@@ -13,7 +13,7 @@
                 :key="i"
                 :class="{ 'is-active': i === arrowCounter }"
                 @click="setResult(result)">
-                {{ result.value }}
+                {{ getItemValue(result) }}
             </li>
         </ul>
     </div>
@@ -22,6 +22,11 @@
     export default {
         name: 'autocomplete',
         props: {
+            itemValueProperty: {
+                type: String,
+                required: false,
+                default: "value"
+            },
             isAsync: {
                 type: Boolean,
                 required: false,
@@ -32,17 +37,20 @@
                 required: false,
                 default: () => [],
             },
-        },
+        }, 
         data() {
             return {
                 search: '',
                 results: [],
                 isOpen: false,
                 isLoading: false,
-                arrowCounter: 0,
+                arrowCounter: 0, 
             };
         },
         methods: {
+            getItemValue: function (item) { 
+                return item[this.itemValueProperty];
+            },
             handleClickOutside(evt) {
                 if (!this.$el.contains(evt.target)) {
                     this.isOpen = false;
@@ -60,8 +68,8 @@
                 }
             },
             onEnter() {
-                if (this.isOpen) {
-                    this.search = this.results[this.arrowCounter].value;
+                if (this.isOpen && this.arrowCounter > -1) {
+                    this.search = this.getItemValue(this.results[this.arrowCounter]);
                     this.isOpen = false;
                     this.arrowCounter = -1;
                 }
@@ -71,7 +79,7 @@
                 }
             },
             setResult(item) {
-                this.search = item.value;
+                this.search = this.getItemValue(item);
                 this.isOpen = false;
                 this.arrowCounter = -1;
             },

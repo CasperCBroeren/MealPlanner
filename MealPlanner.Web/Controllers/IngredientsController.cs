@@ -23,6 +23,19 @@ namespace mealplanner.Controllers
             return Ok(items); 
         }
 
+        [HttpGet("[action]/{part}")]
+        public async Task<ActionResult> Search([FromRoute]string part)
+        {
+            var items = await this.ingredientRepository.SearchByPart(part);
+            if (items != null)
+            {
+                return Ok(items);
+            }
+            else
+            {
+                return NotFound();
+            }
+        }
 
         [HttpGet("[action]/{name}")]
         public async Task<ActionResult> Find([FromRoute]string name)

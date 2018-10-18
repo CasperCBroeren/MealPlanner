@@ -62,5 +62,10 @@ namespace MealPlanner.Data.Repositories.Elastic
             var result = await this.elasticService.Client.IndexDocumentAsync<Ingredient>(item);
             return result.Result == Nest.Result.Created || result.Result == Nest.Result.Updated;
         }
+
+        public Task<IEnumerable<Ingredient>> SearchByPart(string part)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

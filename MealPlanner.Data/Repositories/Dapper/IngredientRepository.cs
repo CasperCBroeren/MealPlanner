@@ -84,5 +84,15 @@ namespace MealPlanner.Data.Repositories.Dapper
                 }
             }
         }
+
+        public async Task<IEnumerable<Ingredient>> SearchByPart(string part)
+        {
+            var query = $"select * from Ingredients where name like '%'+@part + '%'";
+            using (var connection = new SqlConnection(this.connectionString))
+            {
+                connection.Open();
+                return await connection.QueryAsync<Ingredient>(query, new { part = part });
+            }
+        }
     }
 }

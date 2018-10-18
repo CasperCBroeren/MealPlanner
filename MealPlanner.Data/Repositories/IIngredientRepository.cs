@@ -15,5 +15,6 @@ namespace MealPlanner.Data.Repositories
         Task<bool> Delete(Ingredient item);
 
         Task<bool> Save(Ingredient item);
+        Task<IEnumerable<Ingredient>> SearchByPart(string part);
     }
 }
