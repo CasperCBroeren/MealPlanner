@@ -1,6 +1,6 @@
 <template>
     <div class="autocomplete">
-        <input type="text" v-model="search" autocomplete="off" class="form-control"
+        <input type="text" v-model="search" autocomplete="off" class="form-control" ref="input" 
                v-on:keydown.down="onArrowDown"
                v-on:keydown.up="onArrowUp"
                v-on:keydown.enter="onEnter"
@@ -76,12 +76,15 @@
                 else {
                     this.$emit('keydown-enter', this.search);
                     this.search = null;
+                    this.isOpen = false;
+                    this.arrowCounter = -1; x
                 }
             },
             setResult(item) {
                 this.search = this.getItemValue(item);
                 this.isOpen = false;
                 this.arrowCounter = -1;
+                this.$refs.input.focus();
             },
             onChange() {
                 this.$emit('lookup', this.search); 
@@ -131,10 +134,13 @@
         padding: 0;
         margin: 0;
         border: 1px solid #eeeeee;
-        height: 120px;
+        height: auto;
         position: absolute;
         width: 100%;
         background: #fff;
+        z-index: 100;
+        max-height: 200px;
+        overflow-y: scroll;
     }
 
         .autocomplete-results li {
@@ -142,11 +148,12 @@
             text-align: left;
             padding: 4px 2px;
             cursor: pointer;
+            border-top: 1px solid #ddd;
         }
-
-
-            .autocomplete-results li.is-active,
-            .autocomplete-results li:hover {
+        .autocomplete-results li:first-child {
+            border: 0px;
+        }
+            .autocomplete-results li.is-active, .autocomplete-results li:hover {
                 background-color: #ddd;
                 color: #000;
             }

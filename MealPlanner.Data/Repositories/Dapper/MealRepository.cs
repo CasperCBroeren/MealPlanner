@@ -1,10 +1,10 @@
-﻿using System.Collections.Generic;
-using System.Data.SqlClient;
-using System.Threading.Tasks;
+﻿using Dapper;
 using MealPlanner.Data.Models;
-using Dapper;
-using System.Linq;
 using System;
+using System.Collections.Generic;
+using System.Data.SqlClient;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace MealPlanner.Data.Repositories.Dapper
 {
@@ -22,7 +22,7 @@ namespace MealPlanner.Data.Repositories.Dapper
         {
             this.connectionString = connectionString;
             this.tagRepository = tagRepository;
-        } 
+        }
 
         public async Task<IEnumerable<Meal>> All()
         {
@@ -35,7 +35,7 @@ namespace MealPlanner.Data.Repositories.Dapper
             {
                 connection.Open();
                 var meals = (await connection.QueryAsync(query, MealMapper())).Where(x => x != null).ToList();
-                foreach(var m in meals)
+                foreach (var m in meals)
                 {
                     IEnumerable<Tag> collection = await this.tagRepository.ForMeal(m);
                     m.Tags.AddRange(collection);
@@ -68,8 +68,11 @@ namespace MealPlanner.Data.Repositories.Dapper
                 connection.Open();
                 var items = await connection.QueryAsync(query, MealMapper(),
                 new { name = name });
-                var item =  items.Where(x => x != null).FirstOrDefault();
-                item.Tags.AddRange(await this.tagRepository.ForMeal(item));
+                var item = items.Where(x => x != null).FirstOrDefault();
+                if (item != null)
+                {
+                    item.Tags.AddRange(await this.tagRepository.ForMeal(item)); 
+                }
                 return item;
             }
         }
@@ -82,8 +85,8 @@ namespace MealPlanner.Data.Repositories.Dapper
                 var item = mealStore.ContainsKey(meal.Id.Value) ? mealStore[meal.Id.Value] : meal;
                 if (ingredient != null)
                 {
-                    item.Ingredients.Add(ingredient); 
-                } 
+                    item.Ingredients.Add(ingredient);
+                }
 
                 if (!mealStore.ContainsKey(meal.Id.Value))
                 {
@@ -93,7 +96,7 @@ namespace MealPlanner.Data.Repositories.Dapper
                 else
                 {
                     return null;
-                } 
+                }
             };
         }
 
@@ -110,7 +113,7 @@ namespace MealPlanner.Data.Repositories.Dapper
                     updateCommand.Parameters.Add(new SqlParameter("name", item.Name));
                     updateCommand.Parameters.Add(new SqlParameter("description", item.Description));
                     updateCommand.Parameters.Add(new SqlParameter("mealType", item.MealType));
-                    updateCommand.Parameters.Add(new SqlParameter("id", item.Id)); 
+                    updateCommand.Parameters.Add(new SqlParameter("id", item.Id));
                 }
                 else
                 {
@@ -120,22 +123,27 @@ namespace MealPlanner.Data.Repositories.Dapper
                     if (result.Any())
                     {
                         item.Id = result.FirstOrDefault();
-                    } 
+                    }
                 }
             }
 
             await SaveIngredientsOfMeal(item);
-           await SaveTagsOfMeal(item);
+            await SaveTagsOfMeal(item);
             return true;
         }
 
         private async Task SaveTagsOfMeal(Meal item)
         {
             var tags = await tagRepository.All();
-            foreach(var tagNotSaved in item.Tags.Except(tags))
+            foreach (var tagNotSaved in item.Tags.Except(tags))
             {
-               await this.tagRepository.Save(tagNotSaved);
-            } 
+                await this.tagRepository.Save(tagNotSaved);
+            }
+            var allTags = await this.tagRepository.All();
+            foreach (var tag in item.Tags.Where(x=> !x.Id.HasValue))
+            {
+                tag.Id = allTags.FirstOrDefault(x => x.Value.Equals(tag.Value, StringComparison.InvariantCultureIgnoreCase)).Id;
+            }
 
             var deleteAllQuery = "delete TagsOfMeals where MealId=@mealid";
             var insertQuery = "insert into TagsOfMeals(MealId, TagId) values (@mealid, @tagid)";
@@ -144,7 +152,7 @@ namespace MealPlanner.Data.Repositories.Dapper
                 await connection.OpenAsync();
                 var transaction = connection.BeginTransaction();
                 await connection.ExecuteAsync(deleteAllQuery, new { mealid = item.Id }, transaction);
-                foreach(var tag in item.Tags)
+                foreach (var tag in item.Tags)
                 {
                     await connection.ExecuteAsync(insertQuery, new { mealid = item.Id, tagid = tag.Id }, transaction);
                 }
@@ -164,7 +172,7 @@ namespace MealPlanner.Data.Repositories.Dapper
                 await connection.ExecuteAsync(deleteAllQuery, new { mealid = item.Id }, transaction);
                 for (var i = 0; i < item.Ingredients.Count; i++)
                 {
-                    var ingredient = item.Ingredients[i]; 
+                    var ingredient = item.Ingredients[i];
                     await connection.ExecuteAsync(insertQuery, new { mealid = item.Id, ingredientid = ingredient.Id, amount = ingredient.Amount }, transaction);
                 }
                 transaction.Commit();

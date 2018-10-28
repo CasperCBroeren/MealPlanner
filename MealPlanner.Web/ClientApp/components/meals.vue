@@ -4,7 +4,7 @@
             <div class="col-sm">
                 <h1>Maaltijden</h1>
 
-                <p>De maaltijden die we samen bedenken, gebruiken en opdienen.</p>
+                <p>De maaltijden die we samen bedenken, gebruiken en opdienen. Ga er van uit dat het gerecht voor 4 personen wat betreft de hoeveelheden</p>
                 <form v-on:submit.prevent="findMeal" v-if="!singleItem">
                     <label for="mealName">
                         Zoek maaltijd:
@@ -67,7 +67,8 @@
                                       itemValueProperty="name"
                                       isAsync /> 
                         <span v-if="ingredientToAdd">
-                            Dit ingrediënt bestaat niet, wil je het toevoegen? <button v-on:click="registerNewIngredientAndAdd">Ok</button>
+                            Dit ingrediënt bestaat niet, wil je het toevoegen? <button v-on:click="registerNewIngredientAndAdd">Ja</button>
+                            <button v-on:click="cancelNewIngredient">Nee</button>
                         </span>
 
                         <ul class="ingredientsCollection" v-if="editItem.ingredients">
@@ -84,9 +85,9 @@
                     </div>
                     <div class="form-group">
                         <label for="mealDescription">
-                            Beschrijving:
+                            Bereiding:
                         </label> <br />
-                        <textarea class="form-control" name="mealDescription" id="mealDescription" v-model="editItem.description" />
+                        <textarea class="form-control" name="mealDescription" id="mealDescription" v-model="editItem.description" rows="7" />
                     </div>
                     <input type="button" value="Opslaan" v-on:click="savemeal()" />
                     <input type="button" value="Verwijder" v-if="editItem.created" v-on:click="deletemeal()" />
@@ -132,8 +133,8 @@
                 editItem: {
                     name: "",
                     created: null,
-                    ingredients: [],
-                    ingredientsAmount: []
+                    ingredients: [], 
+                    tags: []
                 },
                 meals: null,
                 ingredientSearchFor: null,
@@ -180,6 +181,9 @@
                     response.data.item.amount = 1;
                     this.editItem.ingredients.push(response.data.item);
                 }
+                this.ingredientToAdd = null;
+            },
+            cancelNewIngredient: function () {
                 this.ingredientToAdd = null;
             },
             decrementAmountIngredient(i, ev) {
@@ -282,8 +286,8 @@
                 this.editItem = {
                     name: "",
                     created: null,
-                    ingredients: [],
-                    ingredientsAmount: []
+                    ingredients: [], 
+                    tags: []
                 };
             },
             findMeal: async function (event) {

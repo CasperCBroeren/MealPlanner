@@ -1,4 +1,4 @@
-﻿import Vue from 'vue'
+import Vue from 'vue'
 import axios from 'axios'
 import moment from 'moment'
 import router from './router'
