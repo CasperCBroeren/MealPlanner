@@ -1,9 +1,9 @@
 <template>
-    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+    <nav class="navbar navbar-expand-lg navbar-light bg-light mb-3">
         <a class="navbar-brand" href="/">MaaltijdPlan</a>
 
         <ul class="navbar-nav mr-auto">
-            <li v-for="route in routes" class="nav-item">
+            <li v-for="route in routes" class="nav-item ml-3">
                 <!-- TODO: highlight active link -->
                 <router-link :to="route.path" class="nav-link">
                     <span :class="route.style"></span> {{ route.display }}
