@@ -4,27 +4,122 @@
             <div class="col-sm">
                 <h1>Week planning</h1>
                 <p>Plan een week met maaltijden en krijg een handige uitdraai van alle ingredienten</p>
-                <form v-on:submit.prevent="saveIngredient">
-                    <ul class="quickNav">
-                        <li><a :href="'/weekplanning/' + prevYear + '/' + prevWeek">&lt;&lt;</a></li>
-                        <li> Week {{week}} van {{year}}</li>
-                        <li><a :href="'/weekplanning/' + nextYear + '/' + nextWeek">&gt;&gt;</a></li>
+                <nav aria-label="Week">
+                    <ul class="pagination justify-content-center">
+                        <li class="page-item"><a class="page-link" :href="'/weekplanning/' + prevYear + '/' + prevWeek">&lt;&lt;</a></li>
+                        <li class="page-item disabled"><a class="page-link pl-5 pr-5" href="#"> Week <b>{{week}}</b> van <b>{{year}}</b></a></li>
+                        <li class="page-item "><a class="page-link" :href="'/weekplanning/' + nextYear + '/' + nextWeek">&gt;&gt;</a></li>
                     </ul>
-                </form>
+                </nav>
+                <div class="card-group">
+                    <div v-for="day in meals" class="card" style="width:18rem">
+                        <div class="card-header">
+                            {{day.day}}
+                        </div>
+                        <div class="card-body"  v-on:click="startMealSelection(day)">
+                            <p v-if="day.meal" class="card-text">{{day.meal.name}}</p>
+                            <p v-else class="card-text"><small class="text-muted">Deze dag is nog niet ingevuld</small></p>
+                        </div>
+                        <div class="card-footer">
+                            <button type="button" class="btn btn-info" v-on:click="startMealSelection(day)">Kies</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="modal fade show" tabindex="-1" role="dialog" v-if="decideMealForDay">
+            <div class="modal-dialog modal-dialog-centered" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Kies een maaltijd voor {{decideMealForDay.day}}</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close" v-on:click="stopMealSelection()">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body text-center" v-if="questionType == 0">
+                        Selecteer maaltijden per<br/>
+                        <button type="button" class="btn btn-info btn-block mt-2"  v-on:click="questionType=1">
+                            <span class="fas fa-utensils"></span> Maaltijd
+                        </button> 
+                        <button type="button" class="btn btn-info btn-block" v-on:click="questionType=2">
+                            <span class="fas fa-lemon"></span>  Ingredienten
+                        </button>
+                        
+                        <button type="button" class="btn btn-info btn-block" v-on:click="questionType=3">
+                            <span class="fas fa-tags" ></span> Type of Tag
+                        </button>
+                    </div>
+                    <div class="modal-body" v-if=" questionType==1">
+                        <div class="form-group">
+                            <label for="searchForMeal">Zoek maaltijd</label>
+                            <input type="text" class="form-control" v-model="searchForMeal" id="searchForMeal" placeholder="Naam van maaltijd" v-on:keydown.enter="searchMeal()">
+                        </div>
+                        <div class="results">
+                            <ul class="list-group">
+                                <a v-for="meal in mealResults" v-on:click="selectMeal(meal)" class="list-group-item list-group-item-action flex-column align-items-start">
+                                    <div class="d-flex w-100 justify-content-between">
+                                        <h5 class="mb-1">{{meal.name}}</h5>
+                                        <small>{{meal.created | formatDate}}</small>
+                                    </div>
+                                    <small>
+                                        <span class="ingredientSmall" v-for="ingredient in meal.ingredients">{{ingredient.name}}</span>
+                                    </small>
+                                </a>
+                             
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="modal-body" v-if="questionType ==2">
+                        <div class="form-group">
+                            <label for="searchForIngredient">Zoek ingredient</label>
+                            <input type="text" class="form-control" v-bind="searchForIngredient" id="searchForIngredient" placeholder="Naam van ingredient">
+                        </div>
+                    </div>
+                    <div class="modal-footer" v-if="questionType >0">
+                        <small class="text-muted" v-if="propesedMeal">Geselecteerd: {{propesedMeal.name}}</small>
+
+                        <button type="button" class="btn btn-secondary" v-on:click="questionType=0" >Terug</button> 
+                        <button type="button" class="btn btn-primary" v-bind:class="{ disabled: !propesedMeal}" v-on:click="finishSelectionMeal()">Selecteer</button>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
+   
 </template>
 
 <script>
+    import moment from 'moment'
 
     export default {
+        props: [
+            'week',
+            'year'
+        ],
+        filters: {
+            formatDate: function (value) {
+                if (value) {
+                    return moment(String(value)).format('MM/DD/YYYY hh:mm')
+                }
+            }
+        },
         data() {
             return {
-                week: this.getWeek(new Date()),
-                year: (new Date()).getFullYear(),
-                forPersons: 2,
-                meals: []
+                questionType: 0,
+                searchForMeal: 'zalm',
+                mealResults: [],
+                decideMealForDay: null,
+                propesedMeal: null,
+                step: 1,
+                meals: [
+                    { day: 'maandag', meal: { name: "Zalm salsa", id: -1 } },
+                    { day: 'dinsdag', meal: null },
+                    { day: 'woensdag', meal: null },
+                    { day: 'donderdag', meal: null },
+                    { day: 'vrijdag', meal: null },
+                    { day: 'zaterdag', meal: null },
+                    { day: 'zondag', meal: null },
+                ]
             }
         },
         computed: {
@@ -46,46 +141,81 @@
                 if (this.week == 1)
                     return 51;
                 else {
-                    return this.week +1;
+                    return this.week - 1;
                 }
             },
             nextWeek: function () {
-                if (this.week == 51)
+                if (this.week >= 51)
                     return 1;
                 else {
-                    return this.week +1;
+                    return this.week + 1;
                 }
             }
         },
         methods: {
-            getWeek: function (date) {
-                var onejan = new Date(date.getFullYear(), 0, 1);
-                var today = new Date(date.getFullYear(), date.getMonth(), date.getDate());
-                var dayOfYear = ((today - onejan + 86400000) / 86400000);
-                return Math.ceil(dayOfYear / 7)
+            startMealSelection: function (day) {
+                this.questionType = 0;
+                this.step = 1;
+                this.searchForMeal = null;
+                this.decideMealForDay = day;
+                this.propesedMeal = null;
+                this.mealResults = [];
+            },
+            stopMealSelection: function () {
+                this.propesedMeal = null;
+                this.decideMealForDay = null;
+
+                this.propesedMeal = null;
+                this.mealResults = [];
+            },
+            selectMeal: function (meal) {
+                this.propesedMeal = meal;
+            },
+            finishSelectionMeal: function () {
+                this.decideMealForDay.meal = this.propesedMeal;
+
+                this.stopMealSelection();
+            },
+            searchMeal: async function() {
+                try {
+                    let response = await this.$http.get('/api/Meal/Find/' + encodeURI(this.searchForMeal));
+
+                    if (response.data) {
+                        this.mealResults = response.data;
+                    }
+                }
+                catch (error) {
+
+                    if (error.response != null && error.response.status == 404) {
+                        
+                    }
+                }
             }
+            
         },
 
         async created() {
 
-            try {
-                let response = await this.$http.get('/api/Ingredients/All')
-
-                this.ingredients = response.data;
-            } catch (error) {
-                console.log(error)
-            }
-
+            
         }
     }
 </script>
 <style>
-    .quickNav {
-        width: 100%;
-        list-style-type: none;
-
+    .page-link {
+        color: #6c757d; 
     }
-    .quickNav li {
+    .modal-dialog {
+        overflow-y: initial !important
+    }
 
+    .results {
+        height: 250px;
+        overflow-y: auto;
+    }
+    .ingredientSmall::before {
+        content: ' - ';
+    }
+    .ingredientSmall:first-child::before {
+        content: '';
     }
 </style>

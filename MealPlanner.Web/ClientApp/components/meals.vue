@@ -1,17 +1,13 @@
 <template>
     <div class="container">
         <div class="row">
-            <div class="col-sm">
+            <div class="col-12">
                 <h1>Maaltijden</h1>
 
                 <p>De maaltijden die we samen bedenken, gebruiken en opdienen. Ga er van uit dat het gerecht voor 4 personen wat betreft de hoeveelheden</p>
                 <form v-on:submit.prevent="findMeal" v-if="!singleItem">
-                    <label for="mealName">
-                        Zoek maaltijd:
-                    </label>
-                    <input type="text" name="SearchTerm" id="searchTerm" v-model="searchTerm" placeholder="naam, tags of ingredienten" autocomplete="off" />
-                    <br />
-                    <input type="button" value="Nieuw gerecht" v-on:click="newMeal" />
+
+                    <button type="button" class="btn btn-primary" v-on:click="newMeal">Nieuw gerecht</button>
                 </form>
 
                 <form v-on:submit.prevent="stopSubmit" v-if="singleItem" class="">
@@ -61,11 +57,11 @@
                         <label for="mealIngredients">
                             Ingrediënten:
                         </label>
-                        <autocomplete :items="ingredientsOptions" name="mealIngredients" id="mealIngredients" 
+                        <autocomplete :items="ingredientsOptions" name="mealIngredients" id="mealIngredients"
                                       v-on:keydown-enter="addIngredient"
                                       v-on:lookup="lookupIngredients"
                                       itemValueProperty="name"
-                                      isAsync /> 
+                                      isAsync />
                         <span v-if="ingredientToAdd">
                             Dit ingrediënt bestaat niet, wil je het toevoegen? <button v-on:click="registerNewIngredientAndAdd">Ja</button>
                             <button v-on:click="cancelNewIngredient">Nee</button>
@@ -89,11 +85,16 @@
                         </label> <br />
                         <textarea class="form-control" name="mealDescription" id="mealDescription" v-model="editItem.description" rows="7" />
                     </div>
-                    <input type="button" value="Opslaan" v-on:click="savemeal()" />
-                    <input type="button" value="Verwijder" v-if="editItem.created" v-on:click="deletemeal()" />
-                    <input type="button" value="Terug" v-if="editItem.created" v-on:click="singleItem=false" />
-                </form>
+                    <button type="button" class="btn btn-primary" value="Opslaan" v-on:click="savemeal()">Opslaan</button>
+                    <button type="button" class="btn" value="Terug" v-if="editItem.created" v-on:click="singleItem=false">Terug</button>
 
+                    <button type="button" class="btn btn-danger float-right" value="Verwijder" v-if="editItem.created" v-on:click="deletemeal()">Verwijder</button>
+                </form>
+            </div>
+        </div>
+
+        <div class="row py-3">
+            <div class="col-12">
                 <table class="items table" v-if="meals && meals.length > 0 && !singleItem">
                     <thead>
                         <tr>
@@ -112,7 +113,7 @@
                             <td>{{ renderIngredients(item.ingredients)}}</td>
                             <td>{{ simpleDate(item.created)}}</td>
                             <td>
-                                <a href="#edit" v-on:click="edit(item)">Bewerk</a>
+                                <a href="#edit" class="btn btn-info" v-on:click="edit(item)">Bewerk</a>
                             </td>
                         </tr>
                     </tbody>
@@ -133,7 +134,7 @@
                 editItem: {
                     name: "",
                     created: null,
-                    ingredients: [], 
+                    ingredients: [],
                     tags: []
                 },
                 meals: null,
@@ -205,7 +206,7 @@
             removeTag: function (i, ev) {
                 this.editItem.tags.splice(i, 1);
             },
-            addTag: async function (value) { 
+            addTag: async function (value) {
 
                 var tag = value.toUpperCase();
                 if (this.editItem.tags.find(function (x) {
@@ -217,26 +218,25 @@
                 this.tagSearchFor = null;
 
             },
-            addIngredient: async function (value) {
-                console.log(value + " add");
-                    try {
-                        let response = await this.$http.get('/api/Ingredients/Find/' + value);
+            addIngredient: async function (value) { 
+                try {
+                    let response = await this.$http.get('/api/Ingredients/Find/' + value);
 
-                        if (response.data && this.filterValue(this.editItem.ingredients, "id", response.data.uid) == null) {
-                            response.data.amount = 1;
-                            this.editItem.ingredients.push(response.data);
-                        } 
+                    if (response.data && this.filterValue(this.editItem.ingredients, "id", response.data.uid) == null) {
+                        response.data.amount = 1;
+                        this.editItem.ingredients.push(response.data);
                     }
-                    catch (error) {
+                }
+                catch (error) {
 
-                        if (error.response != null && error.response.status == 404) {
-                            this.ingredientToAdd = {
-                                name: value,
-                                amount: 1
-                            }
+                    if (error.response != null && error.response.status == 404) {
+                        this.ingredientToAdd = {
+                            name: value,
+                            amount: 1
                         }
                     }
-                
+                }
+
             },
             renderIngredients: function (items) {
                 if (!items || items.length == 0) return "";
@@ -286,7 +286,7 @@
                 this.editItem = {
                     name: "",
                     created: null,
-                    ingredients: [], 
+                    ingredients: [],
                     tags: []
                 };
             },

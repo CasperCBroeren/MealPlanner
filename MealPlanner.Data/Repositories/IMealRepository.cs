@@ -13,5 +13,7 @@ namespace MealPlanner.Data.Repositories
         Task<bool> Save(Meal item);
 
         Task<bool> Delete(Meal item);
+
+        Task<IEnumerable<Meal>> FindAllByTerm(string term);
     }
 }

@@ -22,6 +22,19 @@ namespace mealplanner.Controllers
             var items = await this.mealRepository.All();
             return Ok(items); 
         }
+        [HttpGet("[action]/{term}")]
+        public async Task<ActionResult> Find([FromRoute]string term)
+        {
+            var item = await this.mealRepository.FindAllByTerm(term);
+            if (item != null)
+            {
+                return Ok(item);
+            }
+            else
+            {
+                return NotFound();
+            }
+        }
 
         [HttpPost("[action]")]
         public async Task<ActionResult> Save([FromBody] Meal item)

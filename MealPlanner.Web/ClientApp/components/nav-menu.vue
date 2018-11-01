@@ -5,7 +5,7 @@
         <ul class="navbar-nav mr-auto">
             <li v-for="route in routes" class="nav-item ml-3">
                 <!-- TODO: highlight active link -->
-                <router-link :to="route.path" class="nav-link">
+                <router-link v-if="!route.hideInMenu" :to="route.path" class="nav-link">
                     <span :class="route.style"></span> {{ route.display }}
                 </router-link>
             </li>

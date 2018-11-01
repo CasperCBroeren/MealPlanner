@@ -179,5 +179,26 @@ namespace MealPlanner.Data.Repositories.Dapper
                 connection.Close();
             }
         }
+
+        public async Task<IEnumerable<Meal>> FindAllByTerm(string term)
+        {
+            var query = $@"SELECT m.Id Id, m.Name Name, m.Description Description, m.Created created, m.Mealtype mealType, 
+                                 i.Id id, i.Name Name, im.Amount Amount
+                            FROM [dbo].[Meals] m 
+	                            left join [dbo].[IngredientsInMeals] im on im.MealId = m.Id
+	                            left join [dbo].[Ingredients] i on im.IngredientId = i.Id
+                            WHERE m.Name like '%'+@term+'%'";
+            using (var connection = new SqlConnection(this.connectionString))
+            {
+                connection.Open();
+                var meals = (await connection.QueryAsync(query, MealMapper(), new { term = term } )).Where(x => x != null).ToList();
+                foreach (var m in meals)
+                {
+                    IEnumerable<Tag> collection = await this.tagRepository.ForMeal(m);
+                    m.Tags.AddRange(collection);
+                };
+                return meals;
+            }
+        }
     }
 }
