@@ -14,7 +14,7 @@
                 <div class="card-group">
                     <div v-for="day in meals" class="card" style="width:18rem">
                         <div class="card-header">
-                            {{day.day}}
+                            {{day.dayName}}
                         </div>
                         <div class="card-body"  v-on:click="startMealSelection(day)">
                             <p v-if="day.meal" class="card-text">{{day.meal.name}}</p>
@@ -106,19 +106,19 @@
         data() {
             return {
                 questionType: 0,
-                searchForMeal: 'zalm',
+                searchForMeal: null,
                 mealResults: [],
                 decideMealForDay: null,
                 propesedMeal: null,
                 step: 1,
                 meals: [
-                    { day: 'maandag', meal: { name: "Zalm salsa", id: -1 } },
-                    { day: 'dinsdag', meal: null },
-                    { day: 'woensdag', meal: null },
-                    { day: 'donderdag', meal: null },
-                    { day: 'vrijdag', meal: null },
-                    { day: 'zaterdag', meal: null },
-                    { day: 'zondag', meal: null },
+                    { dayName: 'maandag', meal: { name: "Zalm salsa", id: -1 } },
+                    { dayName: 'dinsdag', meal: null },
+                    { dayName: 'woensdag', meal: null },
+                    { dayName: 'donderdag', meal: null },
+                    { dayName: 'vrijdag', meal: null },
+                    { dayName: 'zaterdag', meal: null },
+                    { dayName: 'zondag', meal: null },
                 ]
             }
         },
@@ -194,8 +194,20 @@
             
         },
 
-        async created() {
+        async created() { 
+            try {
+                let response = await this.$http.get('/api/Weekplanning/' + this.year + '/' + this.week);
 
+                if (response.data) {
+                    this.meals = response.data.days;
+                }
+            }
+            catch (error) {
+
+                if (error.response != null && error.response.status == 404) {
+
+                }
+            }
             
         }
     }

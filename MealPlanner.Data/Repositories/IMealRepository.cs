@@ -15,5 +15,7 @@ namespace MealPlanner.Data.Repositories
         Task<bool> Delete(Meal item);
 
         Task<IEnumerable<Meal>> FindAllByTerm(string term);
+
+        Task PairMealsToDay(List<Day> days);
     }
 }

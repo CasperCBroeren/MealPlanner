@@ -38,6 +38,11 @@ namespace MealPlanner.Data.Repositories.Elastic
             return item.Documents.Count > 0 ? item.Documents.First() : null;
         }
 
+        public Task PairMealsToDay(List<Day> days)
+        {
+            throw new System.NotImplementedException();
+        }
+
         public async Task<bool> Save(Meal item)
         {
             var result = await this.elasticService.Client.IndexDocumentAsync(item);

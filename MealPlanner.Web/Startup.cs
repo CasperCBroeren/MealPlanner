@@ -38,6 +38,7 @@ namespace mealplanner
 
             services.TryAddTransient<ITagRepository>(s => new TagRepository(connectionString));
             services.TryAddTransient<IIngredientRepository>(s => new IngredientRepository(connectionString));
+            services.TryAddTransient<IWeekplanningRepository>(s => new WeekplanningRepository(s.GetService<IMealRepository>(), connectionString));
             services.TryAddTransient<IMealRepository>(s => new MealRepository(connectionString, s.GetService<ITagRepository>()));
             // Umi for urls
             services.AddUmi();

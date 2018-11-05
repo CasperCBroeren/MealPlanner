@@ -200,5 +200,23 @@ namespace MealPlanner.Data.Repositories.Dapper
                 return meals;
             }
         }
+
+        public async Task PairMealsToDay(List<Day> days)
+        {
+            var items = days.Select(x => x.MealId).ToArray();
+            var query = $@"SELECT * 
+                            FROM [dbo].[Meals] m  
+                            WHERE m.Id in @items";
+             
+            using (var connection = new SqlConnection(this.connectionString))
+            {
+                connection.Open();
+                var meals = (await connection.QueryAsync<Meal>(query, new { items = items })).ToList();
+                foreach (var m in meals)
+                {
+                    days.Where(x => x.MealId == m.Id).ToList().ForEach(x => x.Meal = m); 
+                }; 
+            }
+        }
     }
 }
