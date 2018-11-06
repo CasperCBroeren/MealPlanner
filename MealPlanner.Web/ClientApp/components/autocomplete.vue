@@ -77,7 +77,7 @@
                     this.$emit('keydown-enter', this.search);
                     this.search = null;
                     this.isOpen = false;
-                    this.arrowCounter = -1; x
+                    this.arrowCounter = -1; 
                 }
             },
             setResult(item) {

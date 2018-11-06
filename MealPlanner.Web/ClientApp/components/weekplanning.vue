@@ -37,16 +37,16 @@
                         </button>
                     </div>
                     <div class="modal-body text-center" v-if="questionType == 0">
-                        Selecteer maaltijden per<br/>
-                        <button type="button" class="btn btn-info btn-block mt-2"  v-on:click="questionType=1">
+                        Selecteer maaltijden per<br />
+                        <button type="button" class="btn btn-info btn-block mt-2" v-on:click="questionType=1">
                             <span class="fas fa-utensils"></span> Maaltijd
-                        </button> 
+                        </button>
                         <button type="button" class="btn btn-info btn-block" v-on:click="questionType=2">
                             <span class="fas fa-lemon"></span>  Ingredienten
                         </button>
-                        
+
                         <button type="button" class="btn btn-info btn-block" v-on:click="questionType=3">
-                            <span class="fas fa-tags" ></span> Type of Tag
+                            <span class="fas fa-tags"></span> Type of Tag
                         </button>
                     </div>
                     <div class="modal-body" v-if=" questionType==1">
@@ -65,20 +65,54 @@
                                         <span class="ingredientSmall" v-for="ingredient in meal.ingredients">{{ingredient.name}}</span>
                                     </small>
                                 </a>
-                             
+
                             </ul>
                         </div>
                     </div>
                     <div class="modal-body" v-if="questionType ==2">
                         <div class="form-group">
                             <label for="searchForIngredient">Zoek ingredient</label>
-                            <input type="text" class="form-control" v-bind="searchForIngredient" id="searchForIngredient" placeholder="Naam van ingredient">
+                            <input type="text" class="form-control" v-bind="searchForIngredients" id="searchForIngredient" placeholder="Naam van ingredient">
+                        </div>
+                    </div>
+                    <div class="modal-body" v-if="questionType ==3">
+                        <div class="form-group">
+
+                            <label for="mealType">
+                                Zoek op type:
+                            </label>
+                            <select type="text" class="form-control" name="mealType" id="mealType" v-model="searchForMealType">
+                                <option value="0" selected>Allemaal</option>
+                                <option value="1">Vlees</option>
+                                <option value="2">Vis</option>
+                                <option value="4">Vegatarisch</option>
+                                <option value="5">Zoet</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+
+                            <label for="mealTags">
+                                Tags:
+                            </label>
+                            <autocomplete name="mealTags" id="mealTags"
+                                          v-model="tagSearchFor"
+                                          v-on:keydown-enter="addTag"
+                                          v-on:lookup="lookupTags"
+                                          isAsync />
+
+                            <ul class="tagCollection" v-if="searchForTags">
+                                <li v-for="(item, index) in searchForTags" v-bind:key="item.id">
+                                    {{ item.value }}
+                                    <a v-on:click="removeTag(index, $event)"> x </a>
+                                </li>
+                            </ul>
                         </div>
                     </div>
                     <div class="modal-footer" v-if="questionType >0">
                         <small class="text-muted" v-if="propesedMeal">Geselecteerd: {{propesedMeal.name}}</small>
 
-                        <button type="button" class="btn btn-secondary" v-on:click="questionType=0" >Terug</button> 
+                        <button type="button" class="btn btn-secondary" v-on:click="questionType=0">Terug</button>
                         <button type="button" class="btn btn-primary" v-bind:class="{ disabled: !propesedMeal}" v-on:click="finishSelectionMeal()">Selecteer</button>
                     </div>
                 </div>
@@ -107,6 +141,9 @@
             return {
                 questionType: 0,
                 searchForMeal: null,
+                searchForIngredients: [],
+                searchForMealType: 0,
+                searchForTags: [],
                 mealResults: [],
                 decideMealForDay: null,
                 propesedMeal: null,
@@ -120,7 +157,10 @@
                     { dayName: 'vrijdag', meal: null },
                     { dayName: 'zaterdag', meal: null },
                     { dayName: 'zondag', meal: null },
-                ]
+                ],
+                tagSearchFor: null,
+                tagOptions: [],
+                tags: []
             }
         },
         computed: {
@@ -154,6 +194,57 @@
             }
         },
         methods: {
+            lookupIngredients: async function (val) {
+                if (val.length > 0) {
+                    let response = await this.$http.get('/api/Ingredients/search/' + encodeURI(val));
+                    if (response.data != null) {
+                        this.ingredientsOptions = response.data;
+                    }
+                }
+                else {
+                    this.ingredientsOptions = [];
+                }
+            },
+            lookupTags: async function (val) {
+                if (val.length > 0) {
+                    let response = await this.$http.get('/api/Tag/find/' + encodeURI(val));
+                    if (response.data != null) {
+                        this.tagsOptions = response.data;
+                    }
+                }
+                else {
+                    this.tagsOptions = [];
+                }
+            },
+            addTag: async function (value) {
+
+                var tag = value.toUpperCase();
+                if (this.searchForTags.find(function (x) {
+                    return tag == x.value;
+                }) == null) {
+                    this.searchForTags.push({ id: null, value: tag });
+
+                }
+                this.tagSearchFor = null;
+
+            },
+            addIngredient: async function (value) {
+                try {
+                    let response = await this.$http.get('/api/Ingredients/Find/' + value);
+
+                    if (response.data && this.filterValue(this.searchForIngredients, "id", response.data.uid) == null) {
+                        response.data.amount = 1;
+                        this.searchForIngredients.push(response.data);
+                    }
+                }
+                catch (error) {
+
+                    if (error.response != null && error.response.status == 404) {
+                      
+                    }
+                }
+
+            },
             startMealSelection: function (day) {
                 this.questionType = 0;
                 this.step = 1;
