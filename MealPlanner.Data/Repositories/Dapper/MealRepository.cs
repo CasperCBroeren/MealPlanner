@@ -203,6 +203,7 @@ namespace MealPlanner.Data.Repositories.Dapper
 
         public async Task PairMealsToDay(List<Day> days)
         {
+            if (days == null) return;
             var items = days.Select(x => x.MealId).ToArray();
             var query = $@"SELECT * 
                             FROM [dbo].[Meals] m  

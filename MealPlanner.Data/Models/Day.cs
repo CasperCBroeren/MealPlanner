@@ -2,9 +2,15 @@
 {
     public class Day
     {     
-        public Day(string dayname)
+        public Day()
+        {
+
+        }
+
+        public Day(string dayname, int? mealId)
         {
             this.DayName = dayname;
+            this.MealId = mealId;
         }
 
         

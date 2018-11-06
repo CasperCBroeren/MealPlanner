@@ -24,7 +24,7 @@ namespace MealPlanner.Web.Controllers
         }
 
         [HttpPost("[action]")]
-        public async Task<IActionResult> Save(Weekplanning plan)
+        public async Task<IActionResult> Save([FromBody]Weekplanning plan)
         {
             var item = await this.weekplanning.Save(plan);
             return Ok(item);

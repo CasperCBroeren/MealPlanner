@@ -111,8 +111,9 @@
                 decideMealForDay: null,
                 propesedMeal: null,
                 step: 1,
+                weekPlanningId: null,
                 meals: [
-                    { dayName: 'maandag', meal: { name: "Zalm salsa", id: -1 } },
+                    { dayName: 'maandag', meal: null },
                     { dayName: 'dinsdag', meal: null },
                     { dayName: 'woensdag', meal: null },
                     { dayName: 'donderdag', meal: null },
@@ -172,9 +173,26 @@
                 this.propesedMeal = meal;
             },
             finishSelectionMeal: function () {
-                this.decideMealForDay.meal = this.propesedMeal;
-
+                this.decideMealForDay.meal = this.propesedMeal; 
                 this.stopMealSelection();
+                this.saveWeekplan();
+            },
+            saveWeekplan: async function () {
+                try {
+                    let response = await this.$http.post('/api/Weekplanning/Save', {
+                        days: this.meals,
+                        week: this.week,
+                        year: this.year,
+                        id: this.weekPlanningId
+                    });
+                    this.weekPlanningId = response.data.id;
+                }
+                catch (error) {
+
+                    if (error.response != null && error.response.status == 404) {
+
+                    }
+                }
             },
             searchMeal: async function() {
                 try {
@@ -199,7 +217,10 @@
                 let response = await this.$http.get('/api/Weekplanning/' + this.year + '/' + this.week);
 
                 if (response.data) {
-                    this.meals = response.data.days;
+                    if (response.data.days != null) {
+                        this.meals = response.data.days;
+                    }
+                    this.weekPlanningId = response.data.id;
                 }
             }
             catch (error) {

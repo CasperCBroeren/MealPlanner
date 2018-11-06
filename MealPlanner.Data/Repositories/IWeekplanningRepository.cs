@@ -7,6 +7,6 @@ namespace MealPlanner.Data.Repositories
     {
         Task<Weekplanning> GetForWeekAndYear(int year, int week);
 
-        Task<bool> Save(Weekplanning item);
+        Task<Weekplanning> Save(Weekplanning item);
     }
 }
