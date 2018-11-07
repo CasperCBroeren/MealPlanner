@@ -15,6 +15,7 @@
 <script>
     import Vue from 'vue'
     import Autocomplete from './autocomplete'
+    import TagCollection from './tagCollection'
     import Meals from './meals'
     import Ingredients from './ingredients'
     import HomePage from './home-page'
@@ -23,6 +24,7 @@
 
 
     Vue.component('autocomplete', Autocomplete);
+    Vue.component('tagCollection', TagCollection);
     Vue.component('meals', Meals);
     Vue.component('ingredients', Ingredients);
     Vue.component('weekplanning', WeekPlanning);

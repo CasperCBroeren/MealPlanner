@@ -43,13 +43,7 @@
                                       v-on:keydown-enter="addTag"
                                       v-on:lookup="lookupTags"
                                       isAsync />
-
-                        <ul class="tagCollection" v-if="editItem.tags">
-                            <li v-for="(item, index) in editItem.tags" v-bind:key="item.id">
-                                {{ item.value }}
-                                <a v-on:click="removeTag(index, $event)"> x </a>
-                            </li>
-                        </ul>
+                        <tagCollection :items="editItem.tags" /> 
                     </div>
 
                     <div class="form-group">

@@ -72,7 +72,13 @@
                     <div class="modal-body" v-if="questionType ==2">
                         <div class="form-group">
                             <label for="searchForIngredient">Zoek ingredient</label>
-                            <input type="text" class="form-control" v-bind="searchForIngredients" id="searchForIngredient" placeholder="Naam van ingredient">
+                            <autocomplete name="mealIngredients" id="mealIngredients"
+                                          :items="ingredientOptions" 
+                                          v-on:keydown-enter="addIngredient"
+                                          v-on:lookup="lookupIngredients"
+                                          itemValueProperty="name"
+                                          isAsync />
+                            <tagCollection ref="searchForIngredients" :items="searchForIngredients" itemLabelProperty="name"/> 
                         </div>
                     </div>
                     <div class="modal-body" v-if="questionType ==3">
@@ -147,6 +153,7 @@
                 mealResults: [],
                 decideMealForDay: null,
                 propesedMeal: null,
+                ingredientOptions: [],
                 step: 1,
                 weekPlanningId: null,
                 meals: [
@@ -198,11 +205,11 @@
                 if (val.length > 0) {
                     let response = await this.$http.get('/api/Ingredients/search/' + encodeURI(val));
                     if (response.data != null) {
-                        this.ingredientsOptions = response.data;
+                        this.ingredientOptions = response.data;
                     }
                 }
                 else {
-                    this.ingredientsOptions = [];
+                    this.ingredientOptions = [];
                 }
             },
             lookupTags: async function (val) {
@@ -228,14 +235,13 @@
                 this.tagSearchFor = null;
 
             },
+            filterValue: function (obj, key, value) {
+                return obj.find(function (v) { return v[key] === value });
+            },
             addIngredient: async function (value) {
                 try {
-                    let response = await this.$http.get('/api/Ingredients/Find/' + value);
-
-                    if (response.data && this.filterValue(this.searchForIngredients, "id", response.data.uid) == null) {
-                        response.data.amount = 1;
-                        this.searchForIngredients.push(response.data);
-                    }
+                    let response = await this.$http.get('/api/Ingredients/Find/' + value); 
+                    this.$refs.searchForIngredients.add(response.data);
                 }
                 catch (error) {
 

@@ -3,7 +3,11 @@ import Vuex from 'vuex'
 
 Vue.use(Vuex) 
 
-export default new Vuex.Store( );
+export default new Vuex.Store({
+    state: {
+
+    }
+});
 
 Date.prototype.getWeek = function () {
     var onejan = new Date(this.getFullYear(), 0, 1);

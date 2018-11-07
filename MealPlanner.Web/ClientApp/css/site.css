@@ -3,7 +3,9 @@
 .tagCollection,
 .ingredientsCollection {
     list-style-type: none;
-  }
+    padding: 0px;
+    margin-top: 8px;
+}
     .tagCollection li,
     .ingredientsCollection li {
         display: inline-block;

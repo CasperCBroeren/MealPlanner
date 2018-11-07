@@ -102,7 +102,7 @@
         },
         watch: {
             items: function (value, oldValue) {
-                if (this.isAsync) {
+                if (this.isAsync) { 
                     this.results = value;
                     if (this.results.length > 0) {
                         this.isOpen = true;
