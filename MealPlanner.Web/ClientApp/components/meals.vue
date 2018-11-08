@@ -185,7 +185,7 @@
                 var item = this.editItem.ingredients[i];
                 item.amount -= 1;
 
-                if (this.editItem.ingredients[i].amount > 1) {
+                if (this.editItem.ingredients[i].amount >= 1) {
                     this.$set(this.editItem.indgredients, i, item);
                 }
                 else {
