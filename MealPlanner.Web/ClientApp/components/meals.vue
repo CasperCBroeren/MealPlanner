@@ -80,7 +80,7 @@
                         <textarea class="form-control" name="mealDescription" id="mealDescription" v-model="editItem.description" rows="7" />
                     </div>
                     <button type="button" class="btn btn-primary" value="Opslaan" v-on:click="savemeal()">Opslaan</button>
-                    <button type="button" class="btn" value="Terug" v-if="editItem.created" v-on:click="singleItem=false">Terug</button>
+                    <button type="button" class="btn" value="Terug"  v-on:click="singleItem=false">Terug</button>
 
                     <button type="button" class="btn btn-danger float-right" value="Verwijder" v-if="editItem.created" v-on:click="deletemeal()">Verwijder</button>
                 </form>
