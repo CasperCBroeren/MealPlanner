@@ -22,7 +22,24 @@ namespace mealplanner.Controllers
             var items = await this.mealRepository.All();
             return Ok(items); 
         }
-        [HttpGet("[action]/{term}")]
+
+
+        [HttpPost("[action]")]
+        public async  Task<ActionResult> FindByIngredients([FromBody] Ingredient[] ingredients)
+        {
+            var item = await this.mealRepository.FindByIngredients(ingredients);
+            if (item != null)
+            {
+                return Ok(item);
+            }
+            else
+            {
+                return NotFound();
+            }
+        }
+
+
+        [HttpGet("[action]")]
         public async Task<ActionResult> Find([FromRoute]string term)
         {
             var item = await this.mealRepository.FindAllByTerm(term);

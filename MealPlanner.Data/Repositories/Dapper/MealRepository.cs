@@ -219,5 +219,29 @@ namespace MealPlanner.Data.Repositories.Dapper
                 }; 
             }
         }
+
+        public async Task<IEnumerable<Meal>> FindByIngredients(Ingredient[] ingredients)
+        {
+            var query = $@"SELECT m.Id Id, m.Name Name, m.Description Description, m.Created created, m.Mealtype mealType, 
+                                 i.Id id, i.Name Name, im.Amount Amount
+                            FROM [dbo].[Meals] m 
+                                inner join (select MealId as Id  from IngredientsInMeals where IngredientId in @ingredients) selection on selection.Id =m.Id
+	                            left join [dbo].[IngredientsInMeals] im on im.MealId = m.Id
+	                            left join [dbo].[Ingredients] i on im.IngredientId = i.Id";
+                                 
+            using (var connection = new SqlConnection(this.connectionString))
+            {
+                connection.Open();
+                var ingredientIds = ingredients.Select(x => x.Id).ToList();
+                var meals = (await connection.QueryAsync(query, MealMapper(), new { ingredients = ingredientIds })).Where(x => x != null).ToList();
+                meals = meals.Where(x => ingredientIds.All(y => x.Ingredients.Select(i => i.Id).Contains(y))).ToList();
+                foreach (var m in meals)
+                {
+                    IEnumerable<Tag> collection = await this.tagRepository.ForMeal(m);
+                    m.Tags.AddRange(collection);
+                };
+                return meals;
+            }
+        }
     }
 }

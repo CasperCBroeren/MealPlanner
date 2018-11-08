@@ -25,7 +25,8 @@
                     type: Array,
                     required: false,
                     default: () => [],
-                }
+                },
+                onItemRemoved:  {}
         },
         data() {
             return {
@@ -38,6 +39,8 @@
             removeItem: function(i, event)
             {
                 this.items.splice(i, 1);
+                if (this.onItemRemoved != null)
+                    this.onItemRemoved();
             },
             add: function(item)
             {

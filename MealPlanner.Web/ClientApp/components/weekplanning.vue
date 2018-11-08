@@ -54,31 +54,17 @@
                             <label for="searchForMeal">Zoek maaltijd</label>
                             <input type="text" class="form-control" v-model="searchForMeal" id="searchForMeal" placeholder="Naam van maaltijd" v-on:keydown.enter="searchMeal()">
                         </div>
-                        <div class="results">
-                            <ul class="list-group">
-                                <a v-for="meal in mealResults" v-on:click="selectMeal(meal)" class="list-group-item list-group-item-action flex-column align-items-start">
-                                    <div class="d-flex w-100 justify-content-between">
-                                        <h5 class="mb-1">{{meal.name}}</h5>
-                                        <small>{{meal.created | formatDate}}</small>
-                                    </div>
-                                    <small>
-                                        <span class="ingredientSmall" v-for="ingredient in meal.ingredients">{{ingredient.name}}</span>
-                                    </small>
-                                </a>
-
-                            </ul>
-                        </div>
                     </div>
                     <div class="modal-body" v-if="questionType ==2">
                         <div class="form-group">
                             <label for="searchForIngredient">Zoek ingredient</label>
                             <autocomplete name="mealIngredients" id="mealIngredients"
-                                          :items="ingredientOptions" 
+                                          :items="ingredientOptions"
                                           v-on:keydown-enter="addIngredient"
                                           v-on:lookup="lookupIngredients"
                                           itemValueProperty="name"
                                           isAsync />
-                            <tagCollection ref="searchForIngredients" :items="searchForIngredients" itemLabelProperty="name"/> 
+                            <tagCollection ref="searchForIngredients" :items="searchForIngredients" itemLabelProperty="name" :onItemRemoved="findMealsByIngredients" />
                         </div>
                     </div>
                     <div class="modal-body" v-if="questionType ==3">
@@ -95,7 +81,7 @@
                                 <option value="5">Zoet</option>
                             </select>
                         </div>
-                        
+
                         <div class="form-group">
 
                             <label for="mealTags">
@@ -115,10 +101,26 @@
                             </ul>
                         </div>
                     </div>
+                    <div class="modal-body">
+                        <div class="results" v-if="questionType > 0">
+                            <ul class="list-group">
+                                <a href="#" v-for="meal in mealResults" v-on:click="selectMeal(meal)" class="list-group-item list-group-item-action flex-column align-items-start">
+                                    <div class="d-flex w-100 justify-content-between">
+                                        <h5 class="mb-1">{{meal.name}}</h5>
+                                        <small>{{meal.created | formatDate}}</small>
+                                    </div>
+                                    <small>
+                                        <span class="ingredientSmall" v-for="ingredient in meal.ingredients">{{ingredient.name}}</span>
+                                    </small>
+                                </a>
+
+                            </ul>
+                        </div>
+                    </div>
                     <div class="modal-footer" v-if="questionType >0">
                         <small class="text-muted" v-if="propesedMeal">Geselecteerd: {{propesedMeal.name}}</small>
 
-                        <button type="button" class="btn btn-secondary" v-on:click="questionType=0">Terug</button>
+                        <button type="button" class="btn btn-secondary" v-on:click="back()">Terug</button>
                         <button type="button" class="btn btn-primary" v-bind:class="{ disabled: !propesedMeal}" v-on:click="finishSelectionMeal()">Selecteer</button>
                     </div>
                 </div>
@@ -242,6 +244,7 @@
                 try {
                     let response = await this.$http.get('/api/Ingredients/Find/' + value); 
                     this.$refs.searchForIngredients.add(response.data);
+                    this.findMealsByIngredients();
                 }
                 catch (error) {
 
@@ -251,6 +254,20 @@
                 }
 
             },
+            findMealsByIngredients: async function () {
+                try {
+                    let response = await this.$http.post('/api/Meal/FindByIngredients', this.searchForIngredients);
+
+                    this.mealResults = response.data;
+
+                }
+                catch (error) {
+
+                }
+            },
+            back: function () {
+                this.startMealSelection(this.decideMealForDay);
+            },
             startMealSelection: function (day) {
                 this.questionType = 0;
                 this.step = 1;
@@ -258,6 +275,7 @@
                 this.decideMealForDay = day;
                 this.propesedMeal = null;
                 this.mealResults = [];
+                this.searchForIngredients = [];
             },
             stopMealSelection: function () {
                 this.propesedMeal = null;
