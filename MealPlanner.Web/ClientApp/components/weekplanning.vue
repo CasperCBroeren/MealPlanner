@@ -16,7 +16,7 @@
                         <div class="card-header">
                             {{day.dayName}}
                         </div>
-                        <div class="card-body"  v-on:click="startMealSelection(day)">
+                        <div class="card-body" v-on:click="startMealSelection(day)">
                             <p v-if="day.meal" class="card-text">{{day.meal.name}}</p>
                             <p v-else class="card-text"><small class="text-muted">Deze dag is nog niet ingevuld</small></p>
                         </div>
@@ -73,7 +73,7 @@
                             <label for="mealType">
                                 Zoek op type:
                             </label>
-                            <select type="text" class="form-control" name="mealType" id="mealType" v-model="searchForMealType">
+                            <select type="text" class="form-control" name="mealType" v-model="searchForMealType" @change="findMealsByTagAndType()">
                                 <option value="0" selected>Allemaal</option>
                                 <option value="1">Vlees</option>
                                 <option value="2">Vis</option>
@@ -88,23 +88,20 @@
                                 Tags:
                             </label>
                             <autocomplete name="mealTags" id="mealTags"
+                                          :items="tagOptions"
                                           v-model="tagSearchFor"
                                           v-on:keydown-enter="addTag"
                                           v-on:lookup="lookupTags"
                                           isAsync />
-
-                            <ul class="tagCollection" v-if="searchForTags">
-                                <li v-for="(item, index) in searchForTags" v-bind:key="item.id">
-                                    {{ item.value }}
-                                    <a v-on:click="removeTag(index, $event)"> x </a>
-                                </li>
-                            </ul>
+                            <tagCollection ref="searchForTags" :items="searchForTags" :onItemRemoved="findMealsByTagAndType" />
+                            
                         </div>
                     </div>
                     <div class="modal-body">
                         <div class="results" v-if="questionType > 0">
                             <ul class="list-group">
-                                <a href="#" v-for="meal in mealResults" v-on:click="selectMeal(meal)" class="list-group-item list-group-item-action flex-column align-items-start">
+                                <a href="#" v-for="meal in mealResults" v-on:click="selectMeal(meal)" v-on:dblclick="setAndfinishSelectionMeal(meal)"
+                                   class="list-group-item list-group-item-action flex-column align-items-start">
                                     <div class="d-flex w-100 justify-content-between">
                                         <h5 class="mb-1">{{meal.name}}</h5>
                                         <small>{{meal.created | formatDate}}</small>
@@ -118,16 +115,16 @@
                         </div>
                     </div>
                     <div class="modal-footer" v-if="questionType >0">
-                        <small class="text-muted" v-if="propesedMeal">Geselecteerd: {{propesedMeal.name}}</small>
+                        <small class="text-muted" v-if="proposedMeal">Geselecteerd: {{proposedMeal.name}}</small>
 
                         <button type="button" class="btn btn-secondary" v-on:click="back()">Terug</button>
-                        <button type="button" class="btn btn-primary" v-bind:class="{ disabled: !propesedMeal}" v-on:click="finishSelectionMeal()">Selecteer</button>
+                        <button type="button" class="btn btn-primary" v-bind:class="{ disabled: !proposedMeal}" v-on:click="finishSelectionMeal()">Selecteer</button>
                     </div>
                 </div>
             </div>
         </div>
     </div>
-   
+
 </template>
 
 <script>
@@ -154,7 +151,7 @@
                 searchForTags: [],
                 mealResults: [],
                 decideMealForDay: null,
-                propesedMeal: null,
+                proposedMeal: null,
                 ingredientOptions: [],
                 step: 1,
                 weekPlanningId: null,
@@ -216,13 +213,13 @@
             },
             lookupTags: async function (val) {
                 if (val.length > 0) {
-                    let response = await this.$http.get('/api/Tag/find/' + encodeURI(val));
+                    let response = await this.$http.get('/api/Tag/search/' + encodeURI(val));
                     if (response.data != null) {
-                        this.tagsOptions = response.data;
+                        this.tagOptions = response.data;
                     }
                 }
                 else {
-                    this.tagsOptions = [];
+                    this.tagOptions = [];
                 }
             },
             addTag: async function (value) {
@@ -231,8 +228,12 @@
                 if (this.searchForTags.find(function (x) {
                     return tag == x.value;
                 }) == null) {
-                    this.searchForTags.push({ id: null, value: tag });
+                    let response = await this.$http.get('/api/Tag/find/' + encodeURI(tag));
 
+                    if (response.data != null) {
+                        this.searchForTags.push(response.data);
+                        this.findMealsByTagAndType();
+                    }
                 }
                 this.tagSearchFor = null;
 
@@ -242,17 +243,32 @@
             },
             addIngredient: async function (value) {
                 try {
-                    let response = await this.$http.get('/api/Ingredients/Find/' + value); 
+                    let response = await this.$http.get('/api/Ingredients/Find/' + value);
                     this.$refs.searchForIngredients.add(response.data);
                     this.findMealsByIngredients();
                 }
                 catch (error) {
 
                     if (error.response != null && error.response.status == 404) {
-                      
+
                     }
                 }
 
+            },
+            findMealsByTagAndType: async function() {
+                try {
+                    let response = await this.$http.post('/api/Meal/FindByTagsAndType', {
+                        tags: this.searchForTags,
+                        type: this.searchForMealType
+
+                    });
+
+                    this.mealResults = response.data;
+
+                }
+                catch (error) {
+
+                }
             },
             findMealsByIngredients: async function () {
                 try {
@@ -273,24 +289,37 @@
                 this.step = 1;
                 this.searchForMeal = null;
                 this.decideMealForDay = day;
-                this.propesedMeal = null;
+                this.proposedMeal = null;
                 this.mealResults = [];
+                this.tagSearchFor = [];
+                this.searchForTags = [];
                 this.searchForIngredients = [];
             },
             stopMealSelection: function () {
-                this.propesedMeal = null;
+                this.proposedMeal = null;
                 this.decideMealForDay = null;
 
-                this.propesedMeal = null;
+                this.proposedMeal = null;
                 this.mealResults = [];
             },
             selectMeal: function (meal) {
-                this.propesedMeal = meal;
+                this.proposedMeal = meal;
             },
-            finishSelectionMeal: function () {
-                this.decideMealForDay.meal = this.propesedMeal; 
-                this.stopMealSelection();
-                this.saveWeekplan();
+            setAndfinishSelectionMeal: function (item) {
+                if (item != null)
+                {
+                    this.proposedMeal = item;
+                }
+                this.finishSelectionMeal();
+            },
+            finishSelectionMeal : function()
+            {
+                if (this.proposedMeal != null)
+                {
+                    this.decideMealForDay.meal = this.proposedMeal;
+                    this.stopMealSelection();
+                    this.saveWeekplan();
+                }
             },
             saveWeekplan: async function () {
                 try {
@@ -320,14 +349,14 @@
                 catch (error) {
 
                     if (error.response != null && error.response.status == 404) {
-                        
+
                     }
                 }
             }
-            
+
         },
 
-        async created() { 
+        async created() {
             try {
                 let response = await this.$http.get('/api/Weekplanning/' + this.year + '/' + this.week);
 
@@ -344,14 +373,15 @@
 
                 }
             }
-            
+
         }
     }
 </script>
 <style>
     .page-link {
-        color: #6c757d; 
+        color: #6c757d;
     }
+
     .modal-dialog {
         overflow-y: initial !important
     }
@@ -360,9 +390,11 @@
         height: 250px;
         overflow-y: auto;
     }
+
     .ingredientSmall::before {
         content: ' - ';
     }
+
     .ingredientSmall:first-child::before {
         content: '';
     }

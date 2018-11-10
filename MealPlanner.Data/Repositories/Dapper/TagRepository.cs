@@ -36,6 +36,16 @@ namespace MealPlanner.Data.Repositories.Dapper
             }
         }
 
+        public async Task<Tag> Find(string tag)
+        {
+            var query = $"select Id, Value from Tags where Value like @tag";
+            using (var connection = new SqlConnection(this.connectionString))
+            {
+                connection.Open();
+                return (await connection.QueryAsync<Tag>(query, new { tag = tag })).FirstOrDefault();
+            }
+        }
+
         public async Task<IEnumerable<Tag>> FindStartingWith(string startWith)
         {
             var query = $"select Id, Value from Tags where Value like @start+'%'";

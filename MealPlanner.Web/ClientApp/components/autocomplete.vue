@@ -101,9 +101,9 @@
             }
         },
         watch: {
-            items: function (value, oldValue) {
+            items: function (value, oldValue) { 
                 if (this.isAsync) { 
-                    this.results = value;
+                    this.results = value; 
                     if (this.results.length > 0) {
                         this.isOpen = true;
                         this.isLoading = false;

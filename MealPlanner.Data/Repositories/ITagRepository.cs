@@ -14,5 +14,6 @@ namespace MealPlanner.Data.Repositories
 
         Task<bool> Save(Tag item);
         Task<IEnumerable<Tag>> FindStartingWith(string startWith);
+        Task<Tag> Find(string tag);
     }
 }

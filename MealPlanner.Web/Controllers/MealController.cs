@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using MealPlanner.Data.Models;
 using MealPlanner.Data.Repositories;
+using MealPlanner.Web.ViewModels;
 
 namespace mealplanner.Controllers
 {
@@ -28,6 +29,21 @@ namespace mealplanner.Controllers
         public async  Task<ActionResult> FindByIngredients([FromBody] Ingredient[] ingredients)
         {
             var item = await this.mealRepository.FindByIngredients(ingredients);
+            if (item != null)
+            {
+                return Ok(item);
+            }
+            else
+            {
+                return NotFound();
+            }
+        }
+
+        [HttpPost("[action]")]
+        public async Task<ActionResult> FindByTagsandType([FromBody] SearchByTagsAndType options)
+        {
+
+            var item = await this.mealRepository.FindByTagAndType(options.Tags, options.Type);
             if (item != null)
             {
                 return Ok(item);

@@ -35,13 +35,18 @@ namespace MealPlanner.Data.Repositories.Dapper
             {
                 connection.Open();
                 var meals = (await connection.QueryAsync(query, MealMapper())).Where(x => x != null).ToList();
-                foreach (var m in meals)
-                {
-                    IEnumerable<Tag> collection = await this.tagRepository.ForMeal(m);
-                    m.Tags.AddRange(collection);
-                };
+                await AssignTags(meals);
                 return meals;
             }
+        }
+
+        private async Task AssignTags(List<Meal> meals)
+        {
+            foreach (var m in meals)
+            {
+                IEnumerable<Tag> collection = await this.tagRepository.ForMeal(m);
+                m.Tags.AddRange(collection);
+            };
         }
 
         public async Task<bool> Delete(Meal item)
@@ -69,10 +74,7 @@ namespace MealPlanner.Data.Repositories.Dapper
                 var items = await connection.QueryAsync(query, MealMapper(),
                 new { name = name });
                 var item = items.Where(x => x != null).FirstOrDefault();
-                if (item != null)
-                {
-                    item.Tags.AddRange(await this.tagRepository.ForMeal(item)); 
-                }
+                await AssignTags(new List<Meal> { item });
                 return item;
             }
         }
@@ -140,7 +142,7 @@ namespace MealPlanner.Data.Repositories.Dapper
                 await this.tagRepository.Save(tagNotSaved);
             }
             var allTags = await this.tagRepository.All();
-            foreach (var tag in item.Tags.Where(x=> !x.Id.HasValue))
+            foreach (var tag in item.Tags.Where(x => !x.Id.HasValue))
             {
                 tag.Id = allTags.FirstOrDefault(x => x.Value.Equals(tag.Value, StringComparison.InvariantCultureIgnoreCase)).Id;
             }
@@ -191,12 +193,8 @@ namespace MealPlanner.Data.Repositories.Dapper
             using (var connection = new SqlConnection(this.connectionString))
             {
                 connection.Open();
-                var meals = (await connection.QueryAsync(query, MealMapper(), new { term = term } )).Where(x => x != null).ToList();
-                foreach (var m in meals)
-                {
-                    IEnumerable<Tag> collection = await this.tagRepository.ForMeal(m);
-                    m.Tags.AddRange(collection);
-                };
+                var meals = (await connection.QueryAsync(query, MealMapper(), new { term = term })).Where(x => x != null).ToList();
+                await AssignTags(meals);
                 return meals;
             }
         }
@@ -208,15 +206,15 @@ namespace MealPlanner.Data.Repositories.Dapper
             var query = $@"SELECT * 
                             FROM [dbo].[Meals] m  
                             WHERE m.Id in @items";
-             
+
             using (var connection = new SqlConnection(this.connectionString))
             {
                 connection.Open();
                 var meals = (await connection.QueryAsync<Meal>(query, new { items = items })).ToList();
                 foreach (var m in meals)
                 {
-                    days.Where(x => x.MealId == m.Id).ToList().ForEach(x => x.Meal = m); 
-                }; 
+                    days.Where(x => x.MealId == m.Id).ToList().ForEach(x => x.Meal = m);
+                };
             }
         }
 
@@ -228,18 +226,37 @@ namespace MealPlanner.Data.Repositories.Dapper
                                 inner join (select MealId as Id  from IngredientsInMeals where IngredientId in @ingredients) selection on selection.Id =m.Id
 	                            left join [dbo].[IngredientsInMeals] im on im.MealId = m.Id
 	                            left join [dbo].[Ingredients] i on im.IngredientId = i.Id";
-                                 
+
             using (var connection = new SqlConnection(this.connectionString))
             {
                 connection.Open();
                 var ingredientIds = ingredients.Select(x => x.Id).ToList();
                 var meals = (await connection.QueryAsync(query, MealMapper(), new { ingredients = ingredientIds })).Where(x => x != null).ToList();
                 meals = meals.Where(x => ingredientIds.All(y => x.Ingredients.Select(i => i.Id).Contains(y))).ToList();
-                foreach (var m in meals)
-                {
-                    IEnumerable<Tag> collection = await this.tagRepository.ForMeal(m);
-                    m.Tags.AddRange(collection);
-                };
+                await AssignTags(meals);
+                return meals;
+            }
+        }
+
+        public async Task<IEnumerable<Meal>> FindByTagAndType(Tag[] tags, int type)
+        {
+            var query = $@"SELECT distinct m.Id Id, m.Name Name, m.Description Description, m.Created created, m.Mealtype mealType, 
+                                 i.Id id, i.Name Name, im.Amount Amount
+                            FROM [dbo].[Meals] m 
+                                inner join (select MealId as Id  from TagsOfMeals where TagId in @tags) selection on selection.Id =m.Id
+	                            left join [dbo].[IngredientsInMeals] im on im.MealId = m.Id
+	                            left join [dbo].[Ingredients] i on im.IngredientId = i.Id
+                                where isNull(@selectedType, MealType)=MealType";
+
+            using (var connection = new SqlConnection(this.connectionString))
+            {
+                connection.Open();
+                var tagIds = tags.Select(x => x.Id).ToList();
+                int? selectedType = type == 0 ? new Nullable<int>() : type;
+                var meals = (await connection.QueryAsync(query, MealMapper(), new { tags = tagIds, selectedType = selectedType })).Where(x => x != null).ToList();
+                await AssignTags(meals);
+                meals = meals.Where(x => tagIds.All(y => x.Tags.Select(i => i.Id).Contains(y))).ToList();
+
                 return meals;
             }
         }

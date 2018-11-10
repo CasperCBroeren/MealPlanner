@@ -19,5 +19,7 @@ namespace MealPlanner.Data.Repositories
         Task PairMealsToDay(List<Day> days);
 
         Task<IEnumerable<Meal>> FindByIngredients(Ingredient[] ingredients);
+
+        Task<IEnumerable<Meal>> FindByTagAndType(Tag[] tags, int type);
     }
 }
