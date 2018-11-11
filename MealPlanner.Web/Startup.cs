@@ -1,14 +1,18 @@
+using System;
+using System.Threading.Tasks;
 using MealPlanner.Data.Repositories;
 using MealPlanner.Data.Repositories.Dapper;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.SpaServices.Webpack;
+using Microsoft.Azure.KeyVault;
+using Microsoft.Azure.Services.AppAuthentication;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Logging;
-using Umi.Core;  
+using Umi.Core;
 
 namespace mealplanner
 {
@@ -32,8 +36,7 @@ namespace mealplanner
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            var connectionString = Configuration.GetValue<string>("dbConnectionString"); 
-
+            var connectionString = Configuration["dbConnectionString"];
             services.TryAddSingleton<IHttpContextAccessor, HttpContextAccessor>();
 
             services.TryAddTransient<ITagRepository>(s => new TagRepository(connectionString));
@@ -45,7 +48,7 @@ namespace mealplanner
             // Add framework services.
             services.AddMvc();
         }
-
+         
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory)
         {

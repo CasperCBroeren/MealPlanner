@@ -41,7 +41,7 @@ namespace MealPlanner.Data.Repositories.Dapper
         }
 
         private async Task AssignTags(List<Meal> meals)
-        {
+        { 
             foreach (var m in meals)
             {
                 IEnumerable<Tag> collection = await this.tagRepository.ForMeal(m);
@@ -74,7 +74,10 @@ namespace MealPlanner.Data.Repositories.Dapper
                 var items = await connection.QueryAsync(query, MealMapper(),
                 new { name = name });
                 var item = items.Where(x => x != null).FirstOrDefault();
-                await AssignTags(new List<Meal> { item });
+                if (item != null)
+                {
+                    await AssignTags(new List<Meal> { item });
+                }
                 return item;
             }
         }
