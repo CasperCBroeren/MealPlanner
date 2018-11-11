@@ -36,7 +36,7 @@ namespace mealplanner
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            var connectionString = Configuration["dbConnectionString"];
+            var connectionString = Configuration.GetConnectionString("dbConnectionString");
             services.TryAddSingleton<IHttpContextAccessor, HttpContextAccessor>();
 
             services.TryAddTransient<ITagRepository>(s => new TagRepository(connectionString));
