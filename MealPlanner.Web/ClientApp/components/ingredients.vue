@@ -17,7 +17,7 @@
 
         <p v-if="!ingredients"><em>Laden...</em></p>
 
-        <ul class="ingredientsCollection" v-if="ingredients">
+        <ul class="tagCollection" v-if="ingredients">
             <li v-for="item in ingredients" v-on:click="edit(item)" v-bind:key="item.id">
                     {{ item.name }} 
              </li> 

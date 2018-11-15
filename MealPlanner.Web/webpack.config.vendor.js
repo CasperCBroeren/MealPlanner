@@ -6,6 +6,8 @@ var OptimizeCSSPlugin = require('optimize-css-assets-webpack-plugin');
 module.exports = (env) => {
     const extractCSS = new ExtractTextPlugin('vendor.css');
     const isDevBuild = !(env && env.prod);
+     
+
     return [{
         stats: { modules: false },
         resolve: {
@@ -18,7 +20,7 @@ module.exports = (env) => {
             ]
         },
         entry: {
-            vendor: ['bootstrap', 'bootstrap/dist/css/bootstrap.css', 'event-source-polyfill', 'vue', 'vuex', 'axios', 'moment', 'vue-router', 'jquery'],
+            vendor: ['bootstrap', 'bootstrap/dist/css/bootstrap.css', 'event-source-polyfill', 'vue', 'vuex', 'axios', 'moment', 'vue-router', 'jquery', '@fortawesome/fontawesome-free/css/all.min.css'],
         },
         output: {
             path: path.join(__dirname, 'wwwroot', 'dist'),

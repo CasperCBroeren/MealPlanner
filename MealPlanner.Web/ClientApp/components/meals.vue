@@ -43,7 +43,7 @@
                                       v-on:keydown-enter="addTag"
                                       v-on:lookup="lookupTags"
                                       isAsync />
-                        <tagCollection :items="editItem.tags" /> 
+                        <tagCollection :items="editItem.tags" />
                     </div>
 
                     <div class="form-group">
@@ -61,17 +61,13 @@
                             <button v-on:click="cancelNewIngredient">Nee</button>
                         </span>
 
-                        <ul class="ingredientsCollection" v-if="editItem.ingredients">
-                            <li v-for="(item, index) in editItem.ingredients" v-bind:key="item.id">
-                                <a v-on:click="decrementAmountIngredient(index, $event)"> - </a>
+                        <div class="ingredientsCollection" v-if="editItem.ingredients">
+                            <span v-for="(item, index) in editItem.ingredients" v-bind:key="item.id">
+                                <input type="text" v-model="item.amount" class="ingredientAmount" maxlength="50" />
                                 {{ item.name }}
-                                <span v-if="item.amount > 1">
-                                    x  {{item.amount}}
-                                </span>
-                                <a v-on:click="incrementAmountIngredient(index, $event)"> + </a>
-
-                            </li>
-                        </ul>
+                                <a href="#" v-on:click="removeIngredient(index, $event)"> x </a>
+                            </span>
+                        </div>
                     </div>
                     <div class="form-group">
                         <label for="mealDescription">
@@ -80,7 +76,7 @@
                         <textarea class="form-control" name="mealDescription" id="mealDescription" v-model="editItem.description" rows="7" />
                     </div>
                     <button type="button" class="btn btn-primary" value="Opslaan" v-on:click="savemeal()">Opslaan</button>
-                    <button type="button" class="btn" value="Terug"  v-on:click="singleItem=false">Terug</button>
+                    <button type="button" class="btn" value="Terug" v-on:click="singleItem=false">Terug</button>
 
                     <button type="button" class="btn btn-danger float-right" value="Verwijder" v-if="editItem.created" v-on:click="deletemeal()">Verwijder</button>
                 </form>
@@ -181,16 +177,10 @@
             cancelNewIngredient: function () {
                 this.ingredientToAdd = null;
             },
-            decrementAmountIngredient(i, ev) {
-                var item = this.editItem.ingredients[i];
-                item.amount -= 1;
+            removeIngredient(i, ev) {
 
-                if (this.editItem.ingredients[i].amount >= 1) {
-                    this.$set(this.editItem.indgredients, i, item);
-                }
-                else {
-                    this.editItem.ingredients.splice(i, 1);
-                }
+                this.editItem.ingredients.splice(i, 1);
+
             },
             incrementAmountIngredient(i, ev) {
                 var item = this.editItem.ingredients[i];
@@ -212,7 +202,7 @@
                 this.tagSearchFor = null;
 
             },
-            addIngredient: async function (value) { 
+            addIngredient: async function (value) {
                 try {
                     let response = await this.$http.get('/api/Ingredients/Find/' + value);
 
@@ -336,7 +326,7 @@
         .items li {
             display: inline-block;
             background-color: #aaa;
-            padding: 0.25% 2.5%;
+            padding: 0.25% 0.5%;
             margin: 0.25% 0.5%;
             font-variant: small-caps;
             cursor: pointer;

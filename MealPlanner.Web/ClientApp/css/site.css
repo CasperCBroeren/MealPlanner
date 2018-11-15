@@ -1,13 +1,12 @@
 
 /* site wide styling */
-.tagCollection,
-.ingredientsCollection {
+.tagCollection {
     list-style-type: none;
     padding: 0px;
     margin-top: 8px;
 }
-    .tagCollection li,
-    .ingredientsCollection li {
+
+    .tagCollection li {
         display: inline-block;
         border-radius: .25rem;
         background-color: #81c8d4;
@@ -17,21 +16,52 @@
         cursor: pointer;
         color: #fff;
     }
-        .tagCollection li a,
-        .ingredientsCollection li a {
-            border: 0px solid black; 
+
+        .tagCollection li a {
+            border: 0px solid black;
             color: #333;
             padding: 1px 4px;
             position: inline-block;
         }
-  .form textarea 
-  {
-      width: 100%;
-  }
+
+.ingredientsCollection span {
+    background-color: #81c8d4;
+    padding: .5% 0.5%;
+    margin: 1.25% 0.5%;
+    border-radius: 0.25rem;
+    color: white;
+    display: inline-block;
+    max-width: 20%;
+    position: relative;
+}
+
+    .ingredientsCollection span input {
+        border: 0px solid black;
+        background-color: #a3d7e0;
+        width: 30%;
+        border-radius: .25rem;
+        padding-left: 4px;
+        color: white;
+    }
+
+
+    .ingredientsCollection span a {
+        color: white;
+        font-weight: bold;
+        position: absolute;
+        top: 0px;
+        right: 5px;
+    }
+
+.form textarea {
+    width: 100%;
+}
+
 .btn-primary {
     background-color: #2595a0;
-    border: 0px ;
+    border: 0px;
 }
+
 .modal {
     display: block;
 }

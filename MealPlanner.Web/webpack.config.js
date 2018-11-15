@@ -5,6 +5,7 @@ const bundleOutputDir = './wwwroot/dist';
 
 module.exports = (env) => {
     const isDevBuild = !(env && env.prod);
+
     return [{
         stats: { modules: false },
         entry: { 'main': './ClientApp/boot-app.js' },
@@ -27,8 +28,19 @@ module.exports = (env) => {
             rules: [
                 { test: /\.vue$/, include: /ClientApp/, use: 'vue-loader' },
                 { test: /\.js$/, include: /ClientApp/, use: 'babel-loader' },
-                { test: /\.css$/, use: isDevBuild ? ['style-loader', 'css-loader'] : ExtractTextPlugin.extract({ use: 'css-loader' }) },
-                { test: /\.(png|jpg|jpeg|gif|svg)$/, use: 'url-loader?limit=25000' }
+                { test: /\.css$/, use:   ['style-loader', 'css-loader']  },
+                { test: /\.(png|jpg|jpeg|gif|svg)$/, use: 'url-loader?limit=25000' },
+                  {
+                    test: /.(ttf|otf|eot|svg|woff(2)?)(\?[a-z0-9]+)?$/,
+                    use: [{
+                        loader: 'file-loader',
+                        options: {
+                            name: '[name].[ext]',
+                            outputPath: 'fonts/',    // where the fonts will go
+                            publicPath: '../'       // override the default path
+                        }
+                    }]
+                },
             ]
         },
         plugins: [

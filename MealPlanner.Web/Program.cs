@@ -1,9 +1,5 @@
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Azure.Services.AppAuthentication;
-using Microsoft.Azure.KeyVault;
-using Microsoft.Extensions.Configuration.AzureKeyVault;
+using Microsoft.AspNetCore; 
 
 namespace mealplanner
 {
@@ -21,7 +17,6 @@ namespace mealplanner
                 .UseStartup<Startup>()
                 .Build();
         }
-
-        private static string GetKeyVaultEndpoint() => "https://mealplannerkv.vault.azure.net";
+ 
     }
 }

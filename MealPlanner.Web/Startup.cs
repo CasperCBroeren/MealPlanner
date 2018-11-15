@@ -1,18 +1,15 @@
-using System;
-using System.Threading.Tasks;
 using MealPlanner.Data.Repositories;
 using MealPlanner.Data.Repositories.Dapper;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.SpaServices.Webpack;
-using Microsoft.Azure.KeyVault;
-using Microsoft.Azure.Services.AppAuthentication;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Logging;
-using Umi.Core;
+using Umi.Core; 
+using Joonasw.AspNetCore.SecurityHeaders;
 
 namespace mealplanner
 {
@@ -46,7 +43,7 @@ namespace mealplanner
             // Umi for urls
             services.AddUmi();
             // Add framework services.
-            services.AddMvc();
+            services.AddMvc(); 
         }
          
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -67,8 +64,17 @@ namespace mealplanner
                 app.UseExceptionHandler("/Home/Error");
             }
 
+            app.UseCsp(csp =>
+            {
+                csp.ByDefaultAllow.FromSelf();
+                csp.AllowScripts.FromSelf().From("az416426.vo.msecnd.net").From("dc.services.visualstudio.com");
+                csp.AllowFonts.From("data:").FromSelf();
+                csp.AllowStyles.From("'unsafe-inline'").FromSelf(); 
+            });
+
             app.UseStaticFiles();
             app.UseUmi();
+
             app.UseMvc(routes =>
             {
                 routes.MapRoute(

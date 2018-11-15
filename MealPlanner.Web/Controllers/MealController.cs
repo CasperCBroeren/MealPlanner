@@ -53,9 +53,8 @@ namespace mealplanner.Controllers
                 return NotFound();
             }
         }
-
-
-        [HttpGet("[action]")]
+          
+        [HttpGet("[action]/{term}")]
         public async Task<ActionResult> Find([FromRoute]string term)
         {
             var item = await this.mealRepository.FindAllByTerm(term);

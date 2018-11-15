@@ -7,8 +7,7 @@ namespace MealPlanner.Data.Models
         public IngredientAmount()
         {  
         }  
-        public int Amount {get;set;}
 
-
+        public string Amount {get;set;} 
     }
 }

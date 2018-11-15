@@ -6,10 +6,10 @@
     <UserSecretsId>e53d8827-fdcb-496d-8290-9ff7fcf0ec04</UserSecretsId>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="Microsoft.AspNetCore.All" Version="2.1.5" />
-    <PackageReference Include="Microsoft.Azure.KeyVault" Version="3.0.1" />
+    <PackageReference Include="Joonasw.AspNetCore.SecurityHeaders" Version="2.7.0" />
+    <PackageReference Include="Microsoft.AspNetCore.All" Version="2.1.4" />
     <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.1.1" />
-    <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="2.1.5" />
+    <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="2.1.6" />
     <PackageReference Include="Umi.Core" Version="1.0.2" />
   </ItemGroup>
   <ItemGroup>
