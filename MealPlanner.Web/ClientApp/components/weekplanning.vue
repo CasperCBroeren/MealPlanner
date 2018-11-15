@@ -22,10 +22,13 @@
                             <p v-else class="card-text"><small class="text-muted">Deze dag is nog niet ingevuld</small></p>
                         </div>
                         <div class="card-footer">
-                            <button type="button" class="btn btn-info" v-on:click="startMealSelection(day)">Kies</button>
+                            <button type="button" class="btn btn-info" v-on:click="startMealSelection(day)">Bewerk</button>
                         </div>
                     </div>
-                </div>
+                </div> 
+                <button class="btn float-left mt-3">Ingredienten lijst</button>
+                <button class="btn float-right mt-3">Print alle maaltijden</button>
+               
             </div>
         </div>
         <div class="modal fade show" tabindex="-1" role="dialog" v-if="decideMealForDay">

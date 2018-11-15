@@ -42,6 +42,7 @@
                                       v-model="tagSearchFor"
                                       v-on:keydown-enter="addTag"
                                       v-on:lookup="lookupTags"
+                                      placeholder=""
                                       isAsync />
                         <tagCollection :items="editItem.tags" />
                     </div>
@@ -55,7 +56,7 @@
                                       v-on:keydown-enter="addIngredient"
                                       v-on:lookup="lookupIngredients"
                                       itemValueProperty="name"
-                                      
+                                       placeholder=""
                                       isAsync />
                         
                         <span v-if="ingredientToAdd">
