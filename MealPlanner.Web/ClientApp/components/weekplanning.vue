@@ -25,12 +25,13 @@
                             <button type="button" class="btn btn-info" v-on:click="startMealSelection(day)">Bewerk</button>
                         </div>
                     </div>
-                </div> 
-                <button class="btn float-left mt-3">Ingredienten lijst</button>
-                <button class="btn float-right mt-3">Print alle maaltijden</button>
-               
+                </div>
+                <button class="btn float-left mt-3" v-on:click="printIngredientList=1">Boodschappenlijst</button>
+                <button class="btn float-right mt-3">Uitvoerlijst</button>
+
             </div>
-        </div>
+        </div> 
+
         <div class="modal fade show" tabindex="-1" role="dialog" v-if="decideMealForDay">
             <div class="modal-dialog modal-dialog-centered" role="document">
                 <div class="modal-content">
@@ -41,9 +42,9 @@
                         </button>
                     </div>
                     <div class="modal-body text-center" v-if="questionType == 0">
-                        
+
                         <button type="button" class="btn btn-info btn-block mt-2" v-on:click="questionType=1">
-                            <span class="fas fa-utensils pr-3"></span> Via naam van de maaltijd 
+                            <span class="fas fa-utensils pr-3"></span> Via naam van de maaltijd
                         </button>
                         <button type="button" class="btn btn-info btn-block" v-on:click="questionType=2">
                             <span class="fas fa-lemon pr-3"></span> Via ingredienten van de maaltijd
@@ -54,12 +55,12 @@
                         </button>
                     </div>
                     <div class="modal-body" v-if=" questionType==1">
-                        <div class="form-group"> 
+                        <div class="form-group">
                             <input type="text" class="form-control" v-model="searchForMeal" id="searchForMeal" placeholder="Naam van maaltijd" v-on:keydown.enter="searchMeal()">
                         </div>
                     </div>
                     <div class="modal-body" v-if="questionType ==2">
-                        <div class="form-group"> 
+                        <div class="form-group">
                             <autocomplete name="mealIngredients" id="mealIngredients"
                                           :items="ingredientOptions"
                                           v-on:keydown-enter="addIngredient"
@@ -72,7 +73,7 @@
                     </div>
                     <div class="modal-body" v-if="questionType ==3">
                         <div class="form-group">
-                             
+
                             <select type="text" class="form-control" name="mealType" v-model="searchForMealType" @change="findMealsByTagAndType()">
                                 <option value="0" selected>Alle types</option>
                                 <option value="1">Alleen maaltijden met vlees</option>
@@ -83,7 +84,7 @@
                         </div>
 
                         <div class="form-group">
-                             
+
                             <autocomplete name="mealTags" id="mealTags"
                                           :items="tagOptions"
                                           v-model="tagSearchFor"
@@ -92,7 +93,7 @@
                                           placeholder="Zoek op type.."
                                           isAsync />
                             <tagCollection ref="searchForTags" :items="searchForTags" :onItemRemoved="findMealsByTagAndType" />
-                            
+
                         </div>
                     </div>
                     <div class="modal-body">
@@ -396,6 +397,7 @@
     .ingredientSmall:first-child::before {
         content: '';
     }
+
     .larger {
         text-align: center;
         width: 100%;
