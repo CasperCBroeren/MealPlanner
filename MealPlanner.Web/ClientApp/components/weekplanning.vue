@@ -2,12 +2,13 @@
     <div class="container">
         <div class="row">
             <div class="col-sm">
-                <h1>Week planning</h1>
+                <h2>Week planning</h2>
                 <p>Plan een week met maaltijden en krijg een handige uitdraai van alle ingredienten</p>
                 <nav aria-label="Week">
                     <ul class="pagination justify-content-center">
                         <li class="page-item"><a class="page-link" :href="'/weekplanning/' + prevYear + '/' + prevWeek">&lt;&lt;</a></li>
-                        <li class="page-item disabled"><a class="page-link pl-5 pr-5" href="#"> Week <b>{{week}}</b> van <b>{{year}}</b></a></li>
+                        <li class="page-item-lg disabled larger d-none d-sm-block"><a class="page-link pl-5 pr-5" href="#"> Week <b>{{week}}</b> van <b>{{year}}</b></a></li>
+                        <li class="page-item-lg disabled d-block d-sm-none"><a class="page-link pl-5 pr-5" href="#"> Week <b>{{week}}</b></a></li>
                         <li class="page-item "><a class="page-link" :href="'/weekplanning/' + nextYear + '/' + nextWeek">&gt;&gt;</a></li>
                     </ul>
                 </nav>
@@ -31,67 +32,61 @@
             <div class="modal-dialog modal-dialog-centered" role="document">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <h5 class="modal-title">Kies een maaltijd voor {{decideMealForDay.day}}</h5>
+                        <h5 class="modal-title">Selecteer maaltijd voor {{decideMealForDay.dayName}} </h5>
                         <button type="button" class="close" data-dismiss="modal" aria-label="Close" v-on:click="stopMealSelection()">
                             <span aria-hidden="true">&times;</span>
                         </button>
                     </div>
                     <div class="modal-body text-center" v-if="questionType == 0">
-                        Selecteer maaltijden per<br />
+                        
                         <button type="button" class="btn btn-info btn-block mt-2" v-on:click="questionType=1">
-                            <span class="fas fa-utensils"></span> Maaltijd
+                            <span class="fas fa-utensils pr-3"></span> Via naam van de maaltijd 
                         </button>
                         <button type="button" class="btn btn-info btn-block" v-on:click="questionType=2">
-                            <span class="fas fa-lemon"></span>  Ingredienten
+                            <span class="fas fa-lemon pr-3"></span> Via ingredienten van de maaltijd
                         </button>
 
                         <button type="button" class="btn btn-info btn-block" v-on:click="questionType=3">
-                            <span class="fas fa-tags"></span> Type of Tag
+                            <span class="fas fa-tags pr-3"></span> Via type of tags
                         </button>
                     </div>
                     <div class="modal-body" v-if=" questionType==1">
-                        <div class="form-group">
-                            <label for="searchForMeal">Zoek maaltijd</label>
+                        <div class="form-group"> 
                             <input type="text" class="form-control" v-model="searchForMeal" id="searchForMeal" placeholder="Naam van maaltijd" v-on:keydown.enter="searchMeal()">
                         </div>
                     </div>
                     <div class="modal-body" v-if="questionType ==2">
-                        <div class="form-group">
-                            <label for="searchForIngredient">Zoek ingredient</label>
+                        <div class="form-group"> 
                             <autocomplete name="mealIngredients" id="mealIngredients"
                                           :items="ingredientOptions"
                                           v-on:keydown-enter="addIngredient"
                                           v-on:lookup="lookupIngredients"
                                           itemValueProperty="name"
+                                          placeholder="Zoek ingredient"
                                           isAsync />
                             <tagCollection ref="searchForIngredients" :items="searchForIngredients" itemLabelProperty="name" :onItemRemoved="findMealsByIngredients" />
                         </div>
                     </div>
                     <div class="modal-body" v-if="questionType ==3">
                         <div class="form-group">
-
-                            <label for="mealType">
-                                Zoek op type:
-                            </label>
+                             
                             <select type="text" class="form-control" name="mealType" v-model="searchForMealType" @change="findMealsByTagAndType()">
-                                <option value="0" selected>Allemaal</option>
-                                <option value="1">Vlees</option>
-                                <option value="2">Vis</option>
-                                <option value="4">Vegatarisch</option>
-                                <option value="5">Zoet</option>
+                                <option value="0" selected>Alle types</option>
+                                <option value="1">Alleen maaltijden met vlees</option>
+                                <option value="2">Alleen maaltijden met vis</option>
+                                <option value="4">Alleen maaltijden vegatarisch</option>
+                                <option value="5">Alleen iets zoets</option>
                             </select>
                         </div>
 
                         <div class="form-group">
-
-                            <label for="mealTags">
-                                Tags:
-                            </label>
+                             
                             <autocomplete name="mealTags" id="mealTags"
                                           :items="tagOptions"
                                           v-model="tagSearchFor"
                                           v-on:keydown-enter="addTag"
                                           v-on:lookup="lookupTags"
+                                          placeholder="Zoek op type.."
                                           isAsync />
                             <tagCollection ref="searchForTags" :items="searchForTags" :onItemRemoved="findMealsByTagAndType" />
                             
@@ -138,7 +133,7 @@
         filters: {
             formatDate: function (value) {
                 if (value) {
-                    return moment(String(value)).format('MM/DD/YYYY hh:mm')
+                    return moment(String(value)).format('MM/DD/YYYY')
                 }
             }
         },
@@ -397,5 +392,9 @@
 
     .ingredientSmall:first-child::before {
         content: '';
+    }
+    .larger {
+        text-align: center;
+        width: 100%;
     }
 </style>

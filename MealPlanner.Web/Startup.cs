@@ -68,6 +68,7 @@ namespace mealplanner
             {
                 csp.ByDefaultAllow.FromSelf();
                 csp.AllowScripts.FromSelf().From("az416426.vo.msecnd.net").From("dc.services.visualstudio.com");
+                csp.AllowConnections.ToSelf().To("dc.services.visualstudio.com");
                 csp.AllowFonts.From("data:").FromSelf();
                 csp.AllowStyles.From("'unsafe-inline'").FromSelf(); 
             });

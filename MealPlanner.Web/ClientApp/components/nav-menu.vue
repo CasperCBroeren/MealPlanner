@@ -1,10 +1,9 @@
 <template>
     <nav class="navbar navbar-expand-lg navbar-light bg-light mb-3">
-        <a class="navbar-brand" href="/">MaaltijdPlan</a>
+        <a class="navbar-brand" href="/"><b>Maaltijd</b>Plan</a>
 
         <ul class="navbar-nav mr-auto">
-            <li v-for="route in routes" class="nav-item ml-3">
-                <!-- TODO: highlight active link -->
+            <li v-for="route in routes" class="nav-item ml-3"> 
                 <router-link v-if="!route.hideInMenu" :to="route.path" class="nav-link">
                     <span :class="route.style"></span> {{ route.display }}
                 </router-link>

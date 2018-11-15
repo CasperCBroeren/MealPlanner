@@ -2,9 +2,9 @@
         <div class="container">
   <div class="row">
     <div class="col-sm">     
-        <h1>Boodschappen</h1>
+        <h2>Ingredienten</h2>
 
-        <p>Boodschappen/ingrediënten in ons systeem. Voeg er toe of verwijder foutieve, klik dan een bestaande aan en pas hem aan of verwijder</p>
+        <p>Ingrediënten in ons systeem voor de maaltijden. Voeg er toe of verwijder foutieve, klik dan een bestaande aan en pas hem aan of verwijder</p>
         <form v-on:submit.prevent="saveIngredient">
             <label for="ingredientName">
               Naam:

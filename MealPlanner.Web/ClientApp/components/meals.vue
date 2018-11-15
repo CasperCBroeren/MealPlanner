@@ -2,7 +2,7 @@
     <div class="container">
         <div class="row">
             <div class="col-12">
-                <h1>Maaltijden</h1>
+                <h2>Maaltijden</h2>
 
                 <p>De maaltijden die we samen bedenken, gebruiken en opdienen. Ga er van uit dat het gerecht voor 4 personen wat betreft de hoeveelheden</p>
                 <form v-on:submit.prevent="findMeal" v-if="!singleItem">
@@ -55,7 +55,9 @@
                                       v-on:keydown-enter="addIngredient"
                                       v-on:lookup="lookupIngredients"
                                       itemValueProperty="name"
+                                      
                                       isAsync />
+                        
                         <span v-if="ingredientToAdd">
                             Dit ingrediënt bestaat niet, wil je het toevoegen? <button v-on:click="registerNewIngredientAndAdd">Ja</button>
                             <button v-on:click="cancelNewIngredient">Nee</button>
@@ -151,7 +153,7 @@
             },
             lookupTags: async function (val) {
                 if (val.length > 0) {
-                    let response = await this.$http.get('/api/Tag/find/' + encodeURI(val));
+                    let response = await this.$http.get('/api/Tag/Search/' + encodeURI(val));
                     if (response.data != null) {
                         this.tagsOptions = response.data;
                     }

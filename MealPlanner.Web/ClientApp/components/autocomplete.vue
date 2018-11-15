@@ -1,10 +1,13 @@
 <template>
-    <div class="autocomplete">
-        <input type="text" v-model="search" autocomplete="off" class="form-control" ref="input" 
+    <div class="autocomplete input-group"> 
+        <input type="text" v-model="search" autocomplete="off" class="form-control" ref="input" :placeholder="placeholder"
                v-on:keydown.down="onArrowDown"
                v-on:keydown.up="onArrowUp"
                v-on:keydown.enter="onEnter"
                v-on:input="onChange" />
+        <div class="input-group-append">
+            <button class="btn btn-outline-secondary far fa-plus-square" type="button" v-on:click="finalizeSearch()"></button>
+        </div>
         <ul class="autocomplete-results" v-show="isOpen">
             <li class="loading" v-if="isLoading">
                 Laden....
@@ -36,7 +39,13 @@
                 type: Array,
                 required: false,
                 default: () => [],
-            },
+            }, 
+            placeholder: {
+                type: String,
+                required: false,
+                default: "..."
+            }
+
         }, 
         data() {
             return {
@@ -74,11 +83,14 @@
                     this.arrowCounter = -1;
                 }
                 else {
-                    this.$emit('keydown-enter', this.search);
-                    this.search = null;
-                    this.isOpen = false;
-                    this.arrowCounter = -1; 
+                    this.finalizeSearch();
                 }
+            },
+            finalizeSearch() { 
+                this.$emit('keydown-enter', this.search);
+                this.search = null;
+                this.isOpen = false;
+                this.arrowCounter = -1; 
             },
             setResult(item) {
                 this.search = this.getItemValue(item);
@@ -141,6 +153,7 @@
         z-index: 100;
         max-height: 200px;
         overflow-y: scroll;
+        top: 40px;
     }
 
         .autocomplete-results li {
