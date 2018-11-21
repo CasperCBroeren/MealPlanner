@@ -21,7 +21,7 @@ namespace MealPlanner.Data.Repositories.Dapper
             var query = $"select Id, Value from Tags";
             using (var connection = new SqlConnection(this.connectionString))
             {
-                connection.Open();
+               await connection.OpenAsync();
                 return await connection.QueryAsync<Tag>(query);
             }
         }
@@ -31,7 +31,7 @@ namespace MealPlanner.Data.Repositories.Dapper
             var query = $"delete from Tags where id=@id";
             using (var connection = new SqlConnection(this.connectionString))
             {
-                connection.Open();
+               await connection.OpenAsync();
                 return await connection.ExecuteAsync(query, new { id = item.Id }) == 1;
             }
         }
@@ -41,7 +41,7 @@ namespace MealPlanner.Data.Repositories.Dapper
             var query = $"select Id, Value from Tags where Value like @tag";
             using (var connection = new SqlConnection(this.connectionString))
             {
-                connection.Open();
+               await connection.OpenAsync();
                 return (await connection.QueryAsync<Tag>(query, new { tag = tag })).FirstOrDefault();
             }
         }
@@ -51,7 +51,7 @@ namespace MealPlanner.Data.Repositories.Dapper
             var query = $"select Id, Value from Tags where Value like @start+'%'";
             using (var connection = new SqlConnection(this.connectionString))
             {
-                connection.Open();
+               await connection.OpenAsync();
                 return await connection.QueryAsync<Tag>(query, new { start = startWith });
             }
         }
@@ -61,7 +61,7 @@ namespace MealPlanner.Data.Repositories.Dapper
             var query = $"select Id, Value from Tags t inner join TagsOfMeals tom on tom.TagId = t.Id where tom.MealId=@mealId ";
             using (var connection = new SqlConnection(this.connectionString))
             {
-                connection.Open();
+               await connection.OpenAsync();
                 return await connection.QueryAsync<Tag>(query, new { mealId = meal.Id });
             }
         }
@@ -72,7 +72,7 @@ namespace MealPlanner.Data.Repositories.Dapper
             {   
                 if (!item.Id.HasValue)
                 {
-                    connection.Open();
+                   await connection.OpenAsync();
                     var queryInsert = @"insert into Tags(value) values (@value);
                                         select SCOPE_IDENTITY();";
                     var result = await connection.QueryAsync<int>(queryInsert, new { value = item.Value });

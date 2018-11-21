@@ -25,7 +25,7 @@ namespace MealPlanner.Data.Repositories.Dapper
             {
                 try
                 {
-                    connection.Open();
+                    await connection.OpenAsync();
                     var query = "select id, week, year, Sunday, Monday, Tuesday, Wednesday, Thursday, Friday, Saturday from WeekPlans where year=@year and week=@week";
                     var result = (await connection.QueryAsync(query, new { year = year, week = week })).Select(x =>
                     {
@@ -62,7 +62,7 @@ namespace MealPlanner.Data.Repositories.Dapper
         {
             using (var connection = new SqlConnection(this.connectionString))
             {
-                connection.Open();
+                await connection.OpenAsync();
                 if (!item.Id.HasValue)
                 {
                     var queryInsert = @"insert into WeekPlans(year, week) values (@year, @week);

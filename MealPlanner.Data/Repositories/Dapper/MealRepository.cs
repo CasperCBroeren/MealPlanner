@@ -33,7 +33,7 @@ namespace MealPlanner.Data.Repositories.Dapper
 	                            left join [dbo].[Ingredients] i on im.IngredientId = i.Id";
             using (var connection = new SqlConnection(this.connectionString))
             {
-                connection.Open();
+                await connection.OpenAsync();
                 var meals = (await connection.QueryAsync(query, MealMapper())).Where(x => x != null).ToList();
                 await AssignTags(meals);
                 return meals;
@@ -56,7 +56,7 @@ namespace MealPlanner.Data.Repositories.Dapper
                           delete from dbo.Meals where id=@id;";
             using (var connection = new SqlConnection(this.connectionString))
             {
-                connection.Open();
+                await connection.OpenAsync();
                 return await connection.ExecuteAsync(query, new { id = item.Id }) >= 1;
             }
         }
@@ -70,7 +70,7 @@ namespace MealPlanner.Data.Repositories.Dapper
 	                            left join [dbo].[Ingredients] i on im.IngredientId = i.Id where m.name =@name";
             using (var connection = new SqlConnection(this.connectionString))
             {
-                connection.Open();
+               await connection.OpenAsync();
                 var items = await connection.QueryAsync(query, MealMapper(),
                 new { name = name });
                 var item = items.Where(x => x != null).FirstOrDefault();
@@ -109,7 +109,7 @@ namespace MealPlanner.Data.Repositories.Dapper
         {
             using (var connection = new SqlConnection(this.connectionString))
             {
-                connection.Open();
+                await connection.OpenAsync();
                 if (item.Id.HasValue)
                 {
                     var queryUpdate = $"update Meals set name=@name, description=@description, MealType=@mealtype where id=@id";
@@ -195,7 +195,7 @@ namespace MealPlanner.Data.Repositories.Dapper
                             WHERE m.Name like '%'+@term+'%'";
             using (var connection = new SqlConnection(this.connectionString))
             {
-                connection.Open();
+                await connection.OpenAsync();
                 var meals = (await connection.QueryAsync(query, MealMapper(), new { term = term })).Where(x => x != null).ToList();
                 await AssignTags(meals);
                 return meals;
@@ -212,7 +212,7 @@ namespace MealPlanner.Data.Repositories.Dapper
 
             using (var connection = new SqlConnection(this.connectionString))
             {
-                connection.Open();
+               await connection.OpenAsync();
                 var meals = (await connection.QueryAsync<Meal>(query, new { items = items })).ToList();
                 foreach (var m in meals)
                 {
@@ -232,7 +232,7 @@ namespace MealPlanner.Data.Repositories.Dapper
 
             using (var connection = new SqlConnection(this.connectionString))
             {
-                connection.Open();
+               await connection.OpenAsync();
                 var ingredientIds = ingredients.Select(x => x.Id).ToList();
                 var meals = (await connection.QueryAsync(query, MealMapper(), new { ingredients = ingredientIds })).Where(x => x != null).ToList();
                 meals = meals.Where(x => ingredientIds.All(y => x.Ingredients.Select(i => i.Id).Contains(y))).ToList();
@@ -253,7 +253,7 @@ namespace MealPlanner.Data.Repositories.Dapper
 
             using (var connection = new SqlConnection(this.connectionString))
             {
-                connection.Open();
+               await connection.OpenAsync();
                 var tagIds = tags.Select(x => x.Id).ToList();
                 int? selectedType = type == 0 ? new Nullable<int>() : type;
                 var meals = (await connection.QueryAsync(query, MealMapper(), new { tags = tagIds, selectedType = selectedType })).Where(x => x != null).ToList();

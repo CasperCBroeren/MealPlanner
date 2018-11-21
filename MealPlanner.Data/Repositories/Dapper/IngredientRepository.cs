@@ -1,5 +1,4 @@
 ﻿using MealPlanner.Data.Models;
-using System;
 using System.Collections.Generic;
 using Dapper;
 using System.Threading.Tasks;
@@ -21,7 +20,7 @@ namespace MealPlanner.Data.Repositories.Dapper
             var query = $"select * from Ingredients";
             using (var connection = new SqlConnection(this.connectionString))
             {
-                connection.Open();
+                await connection.OpenAsync();
                 return await connection.QueryAsync<Ingredient>(query);
             }
         }
@@ -31,7 +30,7 @@ namespace MealPlanner.Data.Repositories.Dapper
             var query = $"delete from Ingredients where id=@id";
             using (var connection = new SqlConnection(this.connectionString))
             {
-                connection.Open();
+                await connection.OpenAsync();
                 return await connection.ExecuteAsync(query,new { id = item.Id }) == 1;
             }
         }
@@ -41,7 +40,7 @@ namespace MealPlanner.Data.Repositories.Dapper
             var query = $"select * from Ingredients where name like @name + '%'";
             using (var connection = new SqlConnection(this.connectionString))
             {
-                connection.Open();
+                await connection.OpenAsync();
                 return await connection.QueryAsync<Ingredient>(query, new { name = name });
             }
         }
@@ -51,7 +50,7 @@ namespace MealPlanner.Data.Repositories.Dapper
             var query = $"select * from Ingredients where name=@name";
             using (var connection = new SqlConnection(this.connectionString))
             {
-                connection.Open();
+                await connection.OpenAsync();
                 var items = await connection.QueryAsync<Ingredient>(query, new { name = name });
                 return items.FirstOrDefault();
             }
@@ -61,7 +60,7 @@ namespace MealPlanner.Data.Repositories.Dapper
         {
             using (var connection = new SqlConnection(this.connectionString))
             {
-                connection.Open();
+                await connection.OpenAsync();
                 if (item.Id.HasValue)
                 { 
                     var queryUpdate = $"update Ingredients set name=@name where id=@id";
@@ -90,7 +89,7 @@ namespace MealPlanner.Data.Repositories.Dapper
             var query = $"select * from Ingredients where name like '%'+@part + '%'";
             using (var connection = new SqlConnection(this.connectionString))
             {
-                connection.Open();
+                await connection.OpenAsync();
                 return await connection.QueryAsync<Ingredient>(query, new { part = part });
             }
         }

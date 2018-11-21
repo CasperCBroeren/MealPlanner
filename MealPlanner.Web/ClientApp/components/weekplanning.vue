@@ -22,12 +22,16 @@
                             <p v-else class="card-text"><small class="text-muted">Deze dag is nog niet ingevuld</small></p>
                         </div>
                         <div class="card-footer">
-                            <button type="button" class="btn btn-info" v-on:click="startMealSelection(day)">Bewerk</button>
+                            <div class="btn-group btn-group-sm">
+                                <button type="button" class="btn btn-info btn-sm" v-on:click="startMealSelection(day)">Bewerk</button>
+                                <a href="#todo" v-if="day.meal" class="btn btn-info btn-sm btn-block">Bekijk</a>
+                            </div>
                         </div>
                     </div>
                 </div>
-                <button class="btn float-left mt-3" v-on:click="printIngredientList=1">Boodschappenlijst</button>
-                <button class="btn float-right mt-3">Uitvoerlijst</button>
+                <a :href="'/shoppinglist/' +year+'/' +week " 
+                   class="btn btn-secondary float-left mt-3 btn-sm">
+                Boodschappenlijst</a> 
 
             </div>
         </div> 
