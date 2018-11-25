@@ -65,3 +65,17 @@
 .modal {
     display: block;
 }
+.btn-infoAlt {
+    background: #17b875;
+    color: #ffffff;
+}
+
+    .btn-infoAlt:hover, .btn-infoAlt:focus, .btn-infoAlt:active, .btn-infoAlt.active, .open > .dropdown-toggle.btn-infoAlt {
+        background: #16a268;
+        color: #ffffff;
+    }
+
+    .btn-infoAlt:active, .btn-infoAlt.active {
+        background: #16a268;
+        box-shadow: none;
+    }

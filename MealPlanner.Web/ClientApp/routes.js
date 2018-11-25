@@ -3,7 +3,8 @@ import Meals from 'components/meals'
 import WeekPlanning from 'components/weekplanning'
 import HomePage from 'components/home-page'
 import Ingredients from 'components/ingredients'
-import shoppinglist from './components/shoppinglist.vue';
+import Shoppinglist from './components/shoppinglist.vue';
+import Recipe from './components/recipe.vue';
 
 export const routes = [
     { path: '/', component: HomePage, display: 'Dashboard', style: 'fa fa-home', hideInMenu: true },
@@ -22,7 +23,14 @@ export const routes = [
     { path: '/meals', component: Meals, display: 'Maaltijden', style: 'fa fa-utensils' },
     { path: '/ingredients', component: Ingredients, display: 'Ingrediënten', style: 'fa fa-lemon' },
     {
-        path: '/shoppinglist/:year/:week', component: shoppinglist, hideInMenu: true, props: (route) => ({
+        path: '/shoppinglist/:year/:week', component: Shoppinglist, hideInMenu: true, props: (route) => ({
+            year: route.params.year,
+            week: route.params.week
+        })
+    },
+    {
+        path: '/meal/:id/:year/:week', component: Recipe, hideInMenu: true, props: (route) => ({
+            id: route.params.id,
             year: route.params.year,
             week: route.params.week
         })

@@ -256,11 +256,28 @@ namespace MealPlanner.Data.Repositories.Dapper
                await connection.OpenAsync();
                 var tagIds = tags.Select(x => x.Id).ToList();
                 int? selectedType = type == 0 ? new Nullable<int>() : type;
-                var meals = (await connection.QueryAsync(query, MealMapper(), new { tags = tagIds, selectedType = selectedType })).Where(x => x != null).ToList();
+                var meals = (await connection.QueryAsync(query, MealMapper(), new { tags = tagIds,  selectedType })).Where(x => x != null).ToList();
                 await AssignTags(meals);
                 meals = meals.Where(x => tagIds.All(y => x.Tags.Select(i => i.Id).Contains(y))).ToList();
 
                 return meals;
+            }
+        }
+
+        public async Task<Meal> FindOneById(int id)
+        {
+            var query = $@"SELECT m.Id Id, m.Name Name, m.Description Description, m.Created created, m.Mealtype mealType, 
+                                 i.Id id, i.Name Name, im.Amount Amount
+                            FROM [dbo].[Meals] m 
+	                            left join [dbo].[IngredientsInMeals] im on im.MealId = m.Id
+	                            left join [dbo].[Ingredients] i on im.IngredientId = i.Id
+                           where m.Id =@id";
+            using (var connection = new SqlConnection(this.connectionString))
+            {
+                await connection.OpenAsync();
+                var meal = (await connection.QueryAsync(query, MealMapper(), new { id })).Where(x => x != null).FirstOrDefault();
+                await this.tagRepository.ForMeal(meal);
+                return meal;
             }
         }
     }

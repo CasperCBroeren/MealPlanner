@@ -21,5 +21,7 @@ namespace MealPlanner.Data.Repositories
         Task<IEnumerable<Meal>> FindByIngredients(Ingredient[] ingredients);
 
         Task<IEnumerable<Meal>> FindByTagAndType(Tag[] tags, int type);
+
+        Task<Meal> FindOneById(int id);
     }
 }

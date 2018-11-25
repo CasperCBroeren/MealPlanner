@@ -24,7 +24,7 @@
                         <div class="card-footer">
                             <div class="btn-group btn-group-sm">
                                 <button type="button" class="btn btn-info btn-sm" v-on:click="startMealSelection(day)">Bewerk</button>
-                                <a href="#todo" v-if="day.meal" class="btn btn-info btn-sm btn-block">Bekijk</a>
+                                <a :href="'/meal/'+day.meal.id+'/' +year+'/' +week " v-if="day.meal" class="btn btn-infoAlt btn-sm btn-block">Bekijk</a>
                             </div>
                         </div>
                     </div>

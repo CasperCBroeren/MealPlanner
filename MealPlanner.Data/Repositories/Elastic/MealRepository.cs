@@ -42,6 +42,11 @@ namespace MealPlanner.Data.Repositories.Elastic
             throw new System.NotImplementedException();
         }
 
+        public Task<Meal> FindOneById(int id)
+        {
+            throw new System.NotImplementedException();
+        }
+
         public async Task<Meal> FindOneByName(string name)
         { 
             var item = await this.elasticService.Client.SearchAsync<Meal>(s => s.Query(q => q.Term(t => t.Name, name)).Index(ElasticService.MealIndexName));

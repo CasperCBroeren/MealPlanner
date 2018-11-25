@@ -24,6 +24,13 @@ namespace mealplanner.Controllers
             return Ok(items); 
         }
 
+        [HttpGet("[action]/{id}")]
+        public async Task<ActionResult> Get(int id)
+        {
+            var items = await this.mealRepository.FindOneById(id);
+            return Ok(items);
+        }
+
 
         [HttpPost("[action]")]
         public async  Task<ActionResult> FindByIngredients([FromBody] Ingredient[] ingredients)
