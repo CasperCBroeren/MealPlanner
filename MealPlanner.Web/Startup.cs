@@ -1,5 +1,8 @@
+using Joonasw.AspNetCore.SecurityHeaders;
 using MealPlanner.Data.Repositories;
 using MealPlanner.Data.Repositories.Dapper;
+using MealPlanner.Web.Controllers;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
@@ -8,8 +11,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Logging;
-using Umi.Core; 
-using Joonasw.AspNetCore.SecurityHeaders;
+using Umi.Core;
 
 namespace mealplanner
 {
@@ -40,13 +42,30 @@ namespace mealplanner
             services.TryAddTransient<IIngredientRepository>(s => new IngredientRepository(connectionString));
             services.TryAddTransient<IWeekplanningRepository>(s => new WeekplanningRepository(s.GetService<IMealRepository>(), connectionString));
             services.TryAddTransient<IMealRepository>(s => new MealRepository(connectionString, s.GetService<ITagRepository>()));
+            services.TryAddTransient<IGroupRepository>(s => new GroupRepository(connectionString));
             services.TryAddTransient<IBoughtIngredientRepository>(s => new BoughtIngredientRepository(connectionString));
             // Umi for urls
             services.AddUmi();
             // Add framework services.
-            services.AddMvc(); 
+            services.AddMvc();
+            services.AddAuthentication()
+               .AddCookie(options =>
+               {
+                   options.LoginPath = "/join";
+                   options.Cookie.Name = BaseController.MPGG_COOKIE_NAME;
+                   options.SlidingExpiration = true; 
+               });
+            services.AddAuthorization(options =>
+            {
+                options.AddPolicy("GroupOnly", policy =>
+                {
+                    policy.RequireClaim("GroupId");
+                    policy.AuthenticationSchemes.Add(CookieAuthenticationDefaults.AuthenticationScheme);
+                });
+            });
+
         }
-         
+
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory)
         {
@@ -71,10 +90,12 @@ namespace mealplanner
                 csp.AllowScripts.FromSelf().From("az416426.vo.msecnd.net").From("dc.services.visualstudio.com");
                 csp.AllowConnections.ToSelf().To("dc.services.visualstudio.com");
                 csp.AllowFonts.From("data:").FromSelf();
-                csp.AllowStyles.From("'unsafe-inline'").FromSelf(); 
+                csp.AllowStyles.From("'unsafe-inline'").FromSelf();
             });
 
+
             app.UseStaticFiles();
+
             app.UseUmi();
 
             app.UseMvc(routes =>

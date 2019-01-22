@@ -1,16 +1,18 @@
 using MealPlanner.Data.Repositories;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks;
 
 namespace MealPlanner.Web.Controllers
 {
 
-    [Route("api/[controller]")]
-    public class TagController : Controller
+    [Route("api/[controller]"),
+        Authorize(Policy = "GroupOnly")]
+    public class TagController : BaseController
     {
-        private ITagRepository tagRepository;
+        private readonly ITagRepository tagRepository;
 
-        public TagController(ITagRepository tagRepository)
+        public TagController(IGroupRepository groupRepository, ITagRepository tagRepository) : base(groupRepository)
         {
             this.tagRepository = tagRepository;
         }
@@ -18,14 +20,14 @@ namespace MealPlanner.Web.Controllers
         [HttpGet("[action]/{tag}")]
         public async Task<IActionResult> Find(string tag)
         {
-            var items = await this.tagRepository.Find(tag);
+            var items = await this.tagRepository.Find(tag, await this.GroupId());
             return Ok(items);
         }
 
         [HttpGet("[action]/{startWith}")]
         public async Task<IActionResult> Search(string startWith)
         {
-            var items = await this.tagRepository.FindStartingWith(startWith);
+            var items = await this.tagRepository.FindStartingWith(startWith, await GroupId());
             return Ok(items);
         }
     }

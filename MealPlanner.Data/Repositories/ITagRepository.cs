@@ -6,14 +6,14 @@ namespace MealPlanner.Data.Repositories
 {
     public interface ITagRepository
     {
-        Task<IEnumerable<Tag>> All();
+        Task<IEnumerable<Tag>> All(int groupId);
 
         Task<IEnumerable<Tag>> ForMeal(Meal meal);
         
-        Task<bool> Delete(Tag item);
+        Task<bool> Delete(Tag item, int groupId);
 
-        Task<bool> Save(Tag item);
-        Task<IEnumerable<Tag>> FindStartingWith(string startWith);
-        Task<Tag> Find(string tag);
+        Task<bool> Save(Tag item, int groupId);
+        Task<IEnumerable<Tag>> FindStartingWith(string startWith, int groupId);
+        Task<Tag> Find(string tag, int groupId);
     }
 }

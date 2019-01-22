@@ -4,15 +4,16 @@ using Microsoft.AspNetCore.Mvc;
 using MealPlanner.Data.Models;
 using MealPlanner.Data.Repositories;
 using MealPlanner.Web.ViewModels;
+using Microsoft.AspNetCore.Authorization;
 
-namespace mealplanner.Controllers
+namespace MealPlanner.Web.Controllers
 {
-    [Route("api/[controller]")]
-    public class MealController : Controller
+    [Route("api/[controller]"), Authorize(Policy = "GroupOnly")]
+    public class MealController : BaseController
     {
         private IMealRepository mealRepository;
 
-        public MealController(IMealRepository mealRepository)
+        public MealController(IGroupRepository groupRepository, IMealRepository mealRepository): base(groupRepository)
         {
             this.mealRepository = mealRepository;
         }
@@ -20,14 +21,14 @@ namespace mealplanner.Controllers
         [HttpGet("[action]")]
         public async Task<ActionResult> All()
         {
-            var items = await this.mealRepository.All();
+            var items = await this.mealRepository.All(await this.GroupId());
             return Ok(items); 
         }
 
         [HttpGet("[action]/{id}")]
         public async Task<ActionResult> Get(int id)
         {
-            var items = await this.mealRepository.FindOneById(id);
+            var items = await this.mealRepository.FindOneById(id, await this.GroupId());
             return Ok(items);
         }
 
@@ -35,7 +36,7 @@ namespace mealplanner.Controllers
         [HttpPost("[action]")]
         public async  Task<ActionResult> FindByIngredients([FromBody] Ingredient[] ingredients)
         {
-            var item = await this.mealRepository.FindByIngredients(ingredients);
+            var item = await this.mealRepository.FindByIngredients(ingredients, await this.GroupId());
             if (item != null)
             {
                 return Ok(item);
@@ -50,7 +51,7 @@ namespace mealplanner.Controllers
         public async Task<ActionResult> FindByTagsandType([FromBody] SearchByTagsAndType options)
         {
 
-            var item = await this.mealRepository.FindByTagAndType(options.Tags, options.Type);
+            var item = await this.mealRepository.FindByTagAndType(options.Tags, options.Type, await this.GroupId());
             if (item != null)
             {
                 return Ok(item);
@@ -64,7 +65,7 @@ namespace mealplanner.Controllers
         [HttpGet("[action]/{term}")]
         public async Task<ActionResult> Find([FromRoute]string term)
         {
-            var item = await this.mealRepository.FindAllByTerm(term);
+            var item = await this.mealRepository.FindAllByTerm(term, await this.GroupId());
             if (item != null)
             {
                 return Ok(item);
@@ -83,7 +84,7 @@ namespace mealplanner.Controllers
                 var isDuplicate = false;
                 if (!item.Created.HasValue)
                 { 
-                    var existingItem = await this.mealRepository.FindOneByName(item.Name);
+                    var existingItem = await this.mealRepository.FindOneByName(item.Name, await this.GroupId());
                     if (existingItem == null)
                     {
                         item.Created = DateTime.Now;
@@ -95,10 +96,10 @@ namespace mealplanner.Controllers
                     }
                 }
 
-                var result = await this.mealRepository.Save(item);
+                var result = await this.mealRepository.Save(item, await this.GroupId());
                 return Ok( new {
                                 created = item.Created,
-                                isDuplicate = isDuplicate
+                                isDuplicate
                                 });
             }
             return Ok("nope");
@@ -108,7 +109,7 @@ namespace mealplanner.Controllers
         [HttpPost("[action]")]
         public async Task<ActionResult> Delete([FromBody] Meal item)
         {
-            var result = await this.mealRepository.Delete(item);
+            var result = await this.mealRepository.Delete(item, await this.GroupId());
             return Ok(result ? "done": "nochange");
         }
     }

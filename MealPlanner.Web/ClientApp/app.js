@@ -6,6 +6,9 @@ import store from './store'
 import { sync } from 'vuex-router-sync'
 import App from 'components/app-root'
 import VueAppInsights from 'vue-application-insights'
+import VueCookies from 'vue-cookies'
+
+Vue.use(VueCookies);
  
 Vue.use(VueAppInsights, {
     id: '1f7db19a-d2c9-46b4-9e21-ca7d71f92684',

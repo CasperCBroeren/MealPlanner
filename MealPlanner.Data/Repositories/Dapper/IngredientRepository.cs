@@ -15,66 +15,67 @@ namespace MealPlanner.Data.Repositories.Dapper
         {
             this.connectionString = connectionstring;
         }
-        public async Task<IEnumerable<Ingredient>> All()
+        public async Task<IEnumerable<Ingredient>> All(int groupId)
         {
-            var query = $"select * from Ingredients";
+            var query = $"select * from Ingredients where groupid=@groupId";
             using (var connection = new SqlConnection(this.connectionString))
             {
                 await connection.OpenAsync();
-                return await connection.QueryAsync<Ingredient>(query);
+                return await connection.QueryAsync<Ingredient>(query, new { groupId });
             }
         }
 
-        public async Task<bool> Delete(Ingredient item)
+        public async Task<bool> Delete(int groupId, Ingredient item)
         {
-            var query = $"delete from Ingredients where id=@id";
+            var query = $"delete from Ingredients where id=@id groupId=@groupId";
             using (var connection = new SqlConnection(this.connectionString))
             {
                 await connection.OpenAsync();
-                return await connection.ExecuteAsync(query,new { id = item.Id }) == 1;
+                return await connection.ExecuteAsync(query,new { id = item.Id, groupId }) == 1;
             }
         }
 
-        public async Task<IEnumerable<Ingredient>> FindAllByName(string name)
+        public async Task<IEnumerable<Ingredient>> FindAllByName(int groupId, string name)
         {
-            var query = $"select * from Ingredients where name like @name + '%'";
+            var query = $"select * from Ingredients where name like @name + '%' and groupId=@groupId";
             using (var connection = new SqlConnection(this.connectionString))
             {
                 await connection.OpenAsync();
-                return await connection.QueryAsync<Ingredient>(query, new { name = name });
+                return await connection.QueryAsync<Ingredient>(query, new { name = name, groupId });
             }
         }
 
-        public async Task<Ingredient> FindSingleByName(string name)
+        public async Task<Ingredient> FindSingleByName(int groupId, string name)
         {
-            var query = $"select * from Ingredients where name=@name";
+            var query = $"select * from Ingredients where name=@name and groupId=@groupId";
             using (var connection = new SqlConnection(this.connectionString))
             {
                 await connection.OpenAsync();
-                var items = await connection.QueryAsync<Ingredient>(query, new { name = name });
+                var items = await connection.QueryAsync<Ingredient>(query, new { groupId, name });
                 return items.FirstOrDefault();
             }
         }
 
-        public async Task<bool> Save(Ingredient item)
+        public async Task<bool> Save(int groupId, Ingredient item)
         {
             using (var connection = new SqlConnection(this.connectionString))
             {
                 await connection.OpenAsync();
                 if (item.Id.HasValue)
                 { 
-                    var queryUpdate = $"update Ingredients set name=@name where id=@id";
+                    var queryUpdate = $"update Ingredients set name=@name where id=@id and groupId=@groupId";
 
                     var updateCommand = new SqlCommand(queryUpdate, connection);
                     updateCommand.Parameters.Add(new SqlParameter("name", item.Name));
                     updateCommand.Parameters.Add(new SqlParameter("id", item.Id));
+                    updateCommand.Parameters.Add(new SqlParameter("groupId", groupId));
                     return await updateCommand.ExecuteNonQueryAsync() == 1;
                 }
                 else
                 {
-                    var queryInsert = @"insert into Ingredients(name) values (@name);
+                    var queryInsert = @"insert into Ingredients(name, groupId) values (@name, @groupId);
                                         select SCOPE_IDENTITY();";
-                    var result = await connection.QueryAsync<int>(queryInsert, new { name = item.Name });
+                    var result = await connection.QueryAsync<int>(queryInsert, new { name = item.Name, groupId });
                     if (result.Any())
                     {
                         item.Id = result.FirstOrDefault();
@@ -84,13 +85,13 @@ namespace MealPlanner.Data.Repositories.Dapper
             }
         }
 
-        public async Task<IEnumerable<Ingredient>> SearchByPart(string part)
+        public async Task<IEnumerable<Ingredient>> SearchByPart(int groupId, string part)
         {
-            var query = $"select * from Ingredients where name like '%'+@part + '%'";
+            var query = $"select * from Ingredients where name like '%'+@part + '%' and @groupid=groupid";
             using (var connection = new SqlConnection(this.connectionString))
             {
                 await connection.OpenAsync();
-                return await connection.QueryAsync<Ingredient>(query, new { part = part });
+                return await connection.QueryAsync<Ingredient>(query, new { groupId,  part });
             }
         }
     }

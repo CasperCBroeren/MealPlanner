@@ -6,7 +6,7 @@
                 <ul class="list-group" v-if="list && list.length>0">
                     <li v-for="item in list" class="list-group-item list-group-item-action" v-on:click="setItemBought(item)">
                         <div class="form-check"> 
-                            <input class="form-check-input" type="checkbox" :checked="item.bought" v-on:click="setItemBought(item)" >
+                            <input class="form-check-input" type="checkbox" :checked="item.bought" />
                                  {{item.amount}} {{item.ingredient.name}}
                           </div> 
                     </li>

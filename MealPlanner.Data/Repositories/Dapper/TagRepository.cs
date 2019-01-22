@@ -16,43 +16,43 @@ namespace MealPlanner.Data.Repositories.Dapper
             this.connectionString = connectionString;
         }
 
-        public async Task<IEnumerable<Tag>> All()
+        public async Task<IEnumerable<Tag>> All(int groupId)
         {
-            var query = $"select Id, Value from Tags";
+            var query = $"select Id, Value from Tags where groupId = @groupId";
             using (var connection = new SqlConnection(this.connectionString))
             {
                await connection.OpenAsync();
-                return await connection.QueryAsync<Tag>(query);
+                return await connection.QueryAsync<Tag>(query, new { groupId });
             }
         }
 
-        public async Task<bool> Delete(Tag item)
+        public async Task<bool> Delete(Tag item, int groupId)
         {
             var query = $"delete from Tags where id=@id";
             using (var connection = new SqlConnection(this.connectionString))
             {
                await connection.OpenAsync();
-                return await connection.ExecuteAsync(query, new { id = item.Id }) == 1;
+                return await connection.ExecuteAsync(query, new { id = item.Id, groupId }) == 1;
             }
         }
 
-        public async Task<Tag> Find(string tag)
+        public async Task<Tag> Find(string tag, int groupId)
         {
-            var query = $"select Id, Value from Tags where Value like @tag";
+            var query = $"select Id, Value from Tags where Value like @tag and groupId=@groupId";
             using (var connection = new SqlConnection(this.connectionString))
             {
                await connection.OpenAsync();
-                return (await connection.QueryAsync<Tag>(query, new { tag = tag })).FirstOrDefault();
+                return (await connection.QueryAsync<Tag>(query, new { groupId, tag })).FirstOrDefault();
             }
         }
 
-        public async Task<IEnumerable<Tag>> FindStartingWith(string startWith)
+        public async Task<IEnumerable<Tag>> FindStartingWith(string startWith, int groupId)
         {
-            var query = $"select Id, Value from Tags where Value like @start+'%'";
+            var query = $"select Id, Value from Tags where Value like @start+'%' and groupId = @groupId";
             using (var connection = new SqlConnection(this.connectionString))
             {
                await connection.OpenAsync();
-                return await connection.QueryAsync<Tag>(query, new { start = startWith });
+                return await connection.QueryAsync<Tag>(query, new { start = startWith, groupId });
             }
         }
 
@@ -66,16 +66,16 @@ namespace MealPlanner.Data.Repositories.Dapper
             }
         }
 
-        public async Task<bool> Save(Tag item)
+        public async Task<bool> Save(Tag item, int groupId)
         {
             using (var connection = new SqlConnection(this.connectionString))
             {   
                 if (!item.Id.HasValue)
                 {
                    await connection.OpenAsync();
-                    var queryInsert = @"insert into Tags(value) values (@value);
+                    var queryInsert = @"insert into Tags(value, groupId) values (@value, @groupId);
                                         select SCOPE_IDENTITY();";
-                    var result = await connection.QueryAsync<int>(queryInsert, new { value = item.Value });
+                    var result = await connection.QueryAsync<int>(queryInsert, new { value = item.Value, groupId });
                     if (result.Any())
                     {
                         item.Id = result.FirstOrDefault();

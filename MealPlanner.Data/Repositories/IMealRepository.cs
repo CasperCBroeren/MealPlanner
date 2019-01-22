@@ -6,22 +6,22 @@ namespace MealPlanner.Data.Repositories
 {
     public interface IMealRepository
     {
-        Task<IEnumerable<Meal>> All();
+        Task<IEnumerable<Meal>> All(int groupId);
 
-        Task<Meal> FindOneByName(string name);
+        Task<Meal> FindOneByName(string name, int groupId);
 
-        Task<bool> Save(Meal item);
+        Task<bool> Save(Meal item, int groupId);
 
-        Task<bool> Delete(Meal item);
+        Task<bool> Delete(Meal item, int groupId);
 
-        Task<IEnumerable<Meal>> FindAllByTerm(string term);
+        Task<IEnumerable<Meal>> FindAllByTerm(string term, int groupId);
 
-        Task PairMealsToDay(List<Day> days);
+        Task PairMealsToDay(List<Day> days, int groupId);
 
-        Task<IEnumerable<Meal>> FindByIngredients(Ingredient[] ingredients);
+        Task<IEnumerable<Meal>> FindByIngredients(Ingredient[] ingredients, int groupId);
 
-        Task<IEnumerable<Meal>> FindByTagAndType(Tag[] tags, int type);
+        Task<IEnumerable<Meal>> FindByTagAndType(Tag[] tags, int type, int groupId);
 
-        Task<Meal> FindOneById(int id);
+        Task<Meal> FindOneById(int id, int groupId);
     }
 }

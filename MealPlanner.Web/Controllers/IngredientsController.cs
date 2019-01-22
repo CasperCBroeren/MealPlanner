@@ -1,17 +1,19 @@
-using System;  
+
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
-using MealPlanner.Data.Models; 
+using MealPlanner.Data.Models;
 using MealPlanner.Data.Repositories;
+using Microsoft.AspNetCore.Authorization;
 
-namespace mealplanner.Controllers
+namespace MealPlanner.Web.Controllers
 {
-    [Route("api/[controller]")]
-    public class IngredientsController : Controller
+    [Route("api/[controller]"),
+        Authorize(Policy = "GroupOnly")] 
+    public class IngredientsController : BaseController
     {
         private IIngredientRepository ingredientRepository;
 
-        public IngredientsController(IIngredientRepository ingredientRepository)
+        public IngredientsController(IGroupRepository groupRepository, IIngredientRepository ingredientRepository) : base(groupRepository)
         {
             this.ingredientRepository = ingredientRepository;
         }
@@ -19,14 +21,14 @@ namespace mealplanner.Controllers
         [HttpGet("[action]")]
         public async Task<ActionResult> All()
         {
-            var items = await this.ingredientRepository.All();
+            var items = await this.ingredientRepository.All(await this.GroupId());
             return Ok(items); 
         }
 
         [HttpGet("[action]/{part}")]
         public async Task<ActionResult> Search([FromRoute]string part)
         {
-            var items = await this.ingredientRepository.SearchByPart(part);
+            var items = await this.ingredientRepository.SearchByPart(await this.GroupId(), part);
             if (items != null)
             {
                 return Ok(items);
@@ -40,7 +42,7 @@ namespace mealplanner.Controllers
         [HttpGet("[action]/{name}")]
         public async Task<ActionResult> Find([FromRoute]string name)
         {
-            var item = await this.ingredientRepository.FindSingleByName(name);
+            var item = await this.ingredientRepository.FindSingleByName(await this.GroupId(), name);
             if (item !=null ) 
             {
                 return Ok(item);
@@ -56,7 +58,7 @@ namespace mealplanner.Controllers
         {
             if (!string.IsNullOrWhiteSpace(item.Name))
             {  
-                var result = await this.ingredientRepository.Save(item);
+                var result = await this.ingredientRepository.Save(await this.GroupId(),item);
                 return Ok( new {
                                 id = item.Id, 
                                 item = item
@@ -69,7 +71,7 @@ namespace mealplanner.Controllers
         [HttpPost("[action]")]
         public async Task<ActionResult> Delete([FromBody] Ingredient item)
         {
-            var result = await this.ingredientRepository.Delete(item);
+            var result = await this.ingredientRepository.Delete(await this.GroupId(),item);
             return Ok(result ? "done": "nochange");
         }
     }

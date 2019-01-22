@@ -5,8 +5,8 @@ namespace MealPlanner.Data.Repositories
 {
     public interface IWeekplanningRepository
     {
-        Task<Weekplanning> GetForWeekAndYear(int year, int week);
+        Task<Weekplanning> GetForWeekAndYear(int year, int week, int groupId);
 
-        Task<Weekplanning> Save(Weekplanning item);
+        Task<Weekplanning> Save(Weekplanning item, int groupId );
     }
 }

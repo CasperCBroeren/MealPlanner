@@ -17,14 +17,14 @@ namespace MealPlanner.Data.Repositories.Dapper
             this.connectionString = connectionstring;
         }
 
-        public async Task<IEnumerable<BoughtIngredient>> GetForWeekAndYear(int year, int week)
+        public async Task<IEnumerable<BoughtIngredient>> GetForWeekAndYear(int year, int week, int groupId)
         {
             var query = $@"SELECT   i.Id as IngredientId,bi.id,  bi.Bought, PivotDays.id as WeekplanId, im.Amount as Amount, PivotDays.Day,
                                     i.Id id, i.Name Name
                              FROM  
 								 (select id, Monday, Tuesday, Wednesday, Thursday, Friday, Saturday, Sunday from WeekPlans wp
 								 
-								 where [Week] = @week and [Year]=@year) w
+								 where [Week] = @week and [Year]=@year and [groupId]=@groupId) w
 								 UNPIVOT
 								 (
 									Mealid for Day in (Monday, Tuesday, Wednesday, Thursday, Friday, Saturday, Sunday)
@@ -35,11 +35,12 @@ namespace MealPlanner.Data.Repositories.Dapper
 	                            left join [dbo].[BoughtIngredients] bi   on bi.Ingredient=i.id
 																		and bi.Day = PivotDays.Day	
 																		and bi.WeekPlanId=PivotDays.Id
+                                where i.Id is not null
                               order by Name";
             using (var connection = new SqlConnection(this.connectionString))
             {
                 await connection.OpenAsync();
-                var meals = (await connection.QueryAsync(query, BoughtIngredientMapper(), new { year = year, week = week })).ToList();
+                var meals = (await connection.QueryAsync(query, BoughtIngredientMapper(), new { year, week, groupId})).ToList();
                 return meals;
             }
         }
@@ -53,7 +54,7 @@ namespace MealPlanner.Data.Repositories.Dapper
             };
         }
 
-        public async Task<BoughtIngredient> Save(BoughtIngredient item)
+        public async Task<BoughtIngredient> Save(BoughtIngredient item, int groupId)
         {
             using (var connection = new SqlConnection(this.connectionString))
             {
@@ -61,12 +62,16 @@ namespace MealPlanner.Data.Repositories.Dapper
                               update BoughtIngredients set Bought = @date where weekplanid=@weekplan and Day=@day and ingredient=@ingredient;
                               IF @@ROWCOUNT=0
                               Begin
-                                insert into BoughtIngredients(Bought, WeekPlanId, Day, Ingredient) values(@date, @weekplan, @day, @ingredient);
+                                insert into BoughtIngredients(Bought, WeekPlanId, Day, Ingredient, GroupId) values(@date, @weekplan, @day, @ingredient, @groupId);
                               
                                 select @@identity
                               end";
 
-                var id = await connection.QueryFirstOrDefaultAsync<int>(query, new { date = item.Bought, weekplan = item.WeekPlanId, day = item.Day, ingredient=item.Ingredient.Id });
+                var id = await connection.QueryFirstOrDefaultAsync<int>(query, new { date = item.Bought,
+                                                                                     weekplan = item.WeekPlanId,
+                                                                                     day = item.Day,
+                                                                                     ingredient = item.Ingredient.Id,
+                                                                                     groupId});
 
                 item.Id = id > 0 ? id : item.Id;
                 return item;

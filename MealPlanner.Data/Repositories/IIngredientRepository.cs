@@ -6,15 +6,16 @@ namespace MealPlanner.Data.Repositories
 {
     public interface IIngredientRepository
     {
-        Task<IEnumerable<Ingredient>> All();
+        Task<IEnumerable<Ingredient>> All(int groupId);
 
-        Task<Ingredient> FindSingleByName(string name);
+        Task<Ingredient> FindSingleByName(int groupId, string name);
 
-        Task<IEnumerable<Ingredient>> FindAllByName(string name);
+        Task<IEnumerable<Ingredient>> FindAllByName(int groupId, string name);
  
-        Task<bool> Delete(Ingredient item);
+        Task<bool> Delete(int groupId, Ingredient item);
 
-        Task<bool> Save(Ingredient item);
-        Task<IEnumerable<Ingredient>> SearchByPart(string part);
+        Task<bool> Save(int groupId, Ingredient item);
+
+        Task<IEnumerable<Ingredient>> SearchByPart(int groupId, string part);
     }
 }

@@ -59,8 +59,12 @@
                         </button>
                     </div>
                     <div class="modal-body" v-if=" questionType==1">
-                        <div class="form-group">
-                            <input type="text" class="form-control" v-model="searchForMeal" id="searchForMeal" placeholder="Naam van maaltijd" v-on:keydown.enter="searchMeal()">
+                        <div class="form-group input-group">
+                            <input type="text" class="form-control" v-model="searchForMeal" id="searchForMeal"
+                                   placeholder="Naam van maaltijd" v-on:keydown.enter="searchMeal()">
+                            <div class="input-group-append">
+                                <button class="btn btn-outline-secondary far fa-plus-square" type="button" v-on:click="searchMeal()"></button>
+                            </div>
                         </div>
                     </div>
                     <div class="modal-body" v-if="questionType ==2">

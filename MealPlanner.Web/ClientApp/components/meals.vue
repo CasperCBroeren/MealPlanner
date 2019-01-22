@@ -312,7 +312,10 @@
 
             try {
                 let response = await this.$http.get('/api/Meal/All')
-                this.meals = response.data;
+                console.log(response)
+                if (response.status == 200) {
+                    this.meals = response.data;
+                }
             } catch (error) {
                 console.log(error)
             }

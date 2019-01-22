@@ -6,8 +6,8 @@ namespace MealPlanner.Data.Repositories
 {
     public interface IBoughtIngredientRepository
     {
-        Task<IEnumerable<BoughtIngredient>> GetForWeekAndYear(int year, int week);
+        Task<IEnumerable<BoughtIngredient>> GetForWeekAndYear(int year, int week, int groupId);
 
-        Task<BoughtIngredient> Save(BoughtIngredient item);
+        Task<BoughtIngredient> Save(BoughtIngredient item, int groupId);
     }
 }
