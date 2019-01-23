@@ -12,7 +12,7 @@
         <div class="col-sm-12 align-middle">
             <form asp-controller="Home" asp-action="StartNew">
                 <div class="input-group input-group-lg">
-                    <input type="text" name="groupName" class="form-control" placeholder="Voer een naam in" required autocomplete="off" />
+                    <input type="text" name="groupName" maxlength="100" class="form-control" placeholder="Voer een naam in" required autocomplete="off" />
                     <div class="input-group-append">
                         <button class="btn btn-outline-secondary" type="submit" id="button-addon2">Gaan</button>
                     </div>

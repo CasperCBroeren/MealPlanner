@@ -57,5 +57,20 @@ namespace MealPlanner.Data.Repositories.Dapper
                 return result.FirstOrDefault();
             }
         }
+
+        public async Task<string> GetByName(string name)
+        {
+            using (var connection = new SqlConnection(this.connectionString))
+            {
+                var query = @"select GroupGuid from Groups where name = @name";
+                var result = await connection.QueryAsync<Guid>(query, new { name });
+                var guid = result.FirstOrDefault();
+                if (!guid.Equals(Guid.Empty))
+                {
+                    return guid.ToString();
+                }
+                return null;
+            }
+        }
     }
 }

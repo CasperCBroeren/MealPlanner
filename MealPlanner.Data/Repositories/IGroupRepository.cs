@@ -10,5 +10,6 @@ namespace MealPlanner.Data.Repositories
 
         Task<string> GetName(string groupGuid);
         Task<int> GetId(string groupGuid);
+        Task<string> GetByName(string name);
     }
 }

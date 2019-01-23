@@ -1,7 +1,8 @@
 <template>
     <nav class="navbar navbar-expand-lg navbar-light bg-light mb-3">
         <a class="navbar-brand" href="/"><b>Maaltijd</b>Plan</a>
-        <i>{{this.getGroupName()}}</i>
+        <i>
+             {{this.getGroupName()}}</i>
         <ul class="navbar-nav mr-auto">
             <li v-for="route in routes" class="nav-item ml-3"> 
                 <router-link v-if="!route.hideInMenu" :to="route.path" class="nav-link">
@@ -29,6 +30,9 @@
             },
             getGroupName: function () {
                 return this.$cookies.get('mpggn');
+            },
+            getGroupKey: function () {
+                return this.$cookies.get('mpgg');
             }
         }
     }

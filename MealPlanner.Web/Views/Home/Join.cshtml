@@ -5,24 +5,28 @@
 
             <h1>Welkom</h1>
             <p>
-                We kennen elkaar nog niet! Voer een groepscode in of maak je eigen groep aan<br />
-              
-            </p>
-        </div>
-        <div class="row">
-            <div class="col-sm-6 align-middle">
-                <form action="join" method="get" class="input-group mb-3">
-                    <input type="text" maxlength="36" name="g" id="g" class="form-control" />
-                    <div class="input-group-append">
+                We kennen elkaar nog niet! Voer een groepscode in of maak je eigen groep aan <a href="/new">hier</a>.
+                of voer de groepnaam in en hervat
 
-                        <button type="submit" class="btn btn-primary">Ga verder</button>
-                        </div>
-                </form>
-            </div>
+            </p>
+        </div> 
             <div class="col-sm-6 align-middle">
-                <a href="/new" class="btn btn-primary">Ga naar aanmaken</a>
-            </div>
-        </div>
+                <form action="join" method="post">
+                    <div class="input-group input-group-lg">
+                        <input type="text" maxlength="100" name="name" id="name" placeholder="Naam van de groep" class="form-control" />
+                        <div class="input-group-append">
+                            <button type="submit" class="btn btn-primary">hervat</button>
+                        </div>
+                    </div> 
+                    @if (!string.IsNullOrEmpty(ViewBag.Error))
+                    {
+                        <div class="alert alert-warning mt-3"> 
+                             @ViewBag.Error
+                        </div>
+                    }
+                </form>
+            </div> 
+        
     </div>
 </div>
 

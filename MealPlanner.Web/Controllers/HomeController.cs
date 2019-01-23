@@ -44,19 +44,24 @@ namespace MealPlanner.Web.Controllers
         }
 
         [Route("join"), HttpGet]
-        public async Task<IActionResult> Join([FromQuery]string g)
-        { 
+        public async Task<IActionResult> Join()
+        {  
+            return View("join");
+        }
 
-            if (!string.IsNullOrEmpty(g))
+        [Route("join"), HttpPost]
+        public async Task<IActionResult> JoinByName([FromForm]string name)
+        { 
+            if (!string.IsNullOrEmpty(name))
             {
-                var name = await this.GroupRepository.GetName(g);
-                if (!string.IsNullOrEmpty(name))
+                var groupdGuid = await this.GroupRepository.GetByName(name);
+                if (!string.IsNullOrEmpty(groupdGuid))
                 {
-                    SetCookieFor(g, name);
+                    SetCookieFor(groupdGuid, name);
 
                     var claims = new List<Claim>
                     {
-                        new Claim("GroupId", g),
+                        new Claim("GroupId", groupdGuid),
                     };
 
                     var claimsIdentity = new ClaimsIdentity(
@@ -71,9 +76,9 @@ namespace MealPlanner.Web.Controllers
                     return new RedirectResult("/");
                 }
             }
+            ViewBag.Error = "Helaas kennen we deze groep niet";
             return View("join");
         }
-
 
         private void SetCookieFor(string guid, string name)
         {
