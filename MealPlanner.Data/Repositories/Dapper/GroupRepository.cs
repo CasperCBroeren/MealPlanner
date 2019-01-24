@@ -1,4 +1,5 @@
 ﻿using Dapper;
+using Microsoft.Extensions.Configuration;
 using System;
 using System.Data.SqlClient;
 using System.Linq;
@@ -10,9 +11,9 @@ namespace MealPlanner.Data.Repositories.Dapper
     {
         public string connectionString { get; }
 
-        public GroupRepository(string connectionString)
+        public GroupRepository(IConfiguration config)
         {
-            this.connectionString = connectionString;
+            this.connectionString = config["dbConnectionString"];
         }
 
         public async Task<string> AddNew(string name)

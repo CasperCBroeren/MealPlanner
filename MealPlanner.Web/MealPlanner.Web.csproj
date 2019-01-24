@@ -8,6 +8,8 @@
   <ItemGroup>
     <PackageReference Include="Joonasw.AspNetCore.SecurityHeaders" Version="2.7.0" />
     <PackageReference Include="Microsoft.AspNetCore.All" Version="2.1.4" />
+    <PackageReference Include="Microsoft.AspNetCore.AzureKeyVault.HostingStartup" Version="2.0.2" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.AzureKeyVault" Version="2.2.0" />
     <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.1.1" />
     <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="2.1.6" />
     <PackageReference Include="Umi.Core" Version="1.0.2" />
@@ -23,9 +25,6 @@
     <ProjectReference Include="..\MealPlanner.Data\MealPlanner.Data.csproj" />
   </ItemGroup>
   <ItemGroup>
-    <Content Update="config.json">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
     <Content Update="Views\Home\Join.cshtml">
       <Pack>$(IncludeRazorContentInPack)</Pack>
     </Content>
@@ -35,6 +34,9 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="ClientApp\store\" />
+  </ItemGroup>
+  <ItemGroup>
+    <WCFMetadata Include="Connected Services" />
   </ItemGroup>
   <Target Name="RunWebpack" AfterTargets="ComputeFilesToPublish">
     <Exec Command="npm install" />

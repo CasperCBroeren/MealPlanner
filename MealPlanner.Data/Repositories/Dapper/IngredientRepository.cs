@@ -4,6 +4,7 @@ using Dapper;
 using System.Threading.Tasks;
 using System.Data.SqlClient;
 using System.Linq;
+using Microsoft.Extensions.Configuration;
 
 namespace MealPlanner.Data.Repositories.Dapper
 {
@@ -11,9 +12,9 @@ namespace MealPlanner.Data.Repositories.Dapper
     {
         private readonly string connectionString;
 
-        public IngredientRepository(string connectionstring)
+        public IngredientRepository(IConfiguration config)
         {
-            this.connectionString = connectionstring;
+            this.connectionString = config["dbConnectionString"];
         }
         public async Task<IEnumerable<Ingredient>> All(int groupId)
         {

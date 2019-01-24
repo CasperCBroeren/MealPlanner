@@ -37,7 +37,7 @@ namespace MealPlanner.Web.Controllers
                     return View("new");
                 }
                 var guid = await this.GroupRepository.AddNew(groupName);
-                SetCookieFor(guid, groupName);
+                await JoinGroup(guid, groupName);
                 return new RedirectResult("/");
             }
             return View("new");
@@ -45,34 +45,19 @@ namespace MealPlanner.Web.Controllers
 
         [Route("join"), HttpGet]
         public async Task<IActionResult> Join()
-        {  
+        {
             return View("join");
         }
 
         [Route("join"), HttpPost]
         public async Task<IActionResult> JoinByName([FromForm]string name)
-        { 
+        {
             if (!string.IsNullOrEmpty(name))
             {
-                var groupdGuid = await this.GroupRepository.GetByName(name);
-                if (!string.IsNullOrEmpty(groupdGuid))
+                var groupGuid = await this.GroupRepository.GetByName(name);
+                if (!string.IsNullOrEmpty(groupGuid))
                 {
-                    SetCookieFor(groupdGuid, name);
-
-                    var claims = new List<Claim>
-                    {
-                        new Claim("GroupId", groupdGuid),
-                    };
-
-                    var claimsIdentity = new ClaimsIdentity(
-                        claims, CookieAuthenticationDefaults.AuthenticationScheme);
-
-                    var authProperties = new AuthenticationProperties();
-
-                    await HttpContext.SignInAsync(
-                                CookieAuthenticationDefaults.AuthenticationScheme,
-                                new ClaimsPrincipal(claimsIdentity),
-                                authProperties);
+                    await JoinGroup(groupGuid, name); 
                     return new RedirectResult("/");
                 }
             }
@@ -80,9 +65,22 @@ namespace MealPlanner.Web.Controllers
             return View("join");
         }
 
-        private void SetCookieFor(string guid, string name)
+        private async Task JoinGroup(string groupGuid, string name)
         {
-            this.Response.Cookies.Append(MPGG_COOKIE_NAME, guid);
+            var claims = new List<Claim>
+                    {
+                        new Claim("GroupId", groupGuid),
+                    };
+
+            var claimsIdentity = new ClaimsIdentity(
+                claims, CookieAuthenticationDefaults.AuthenticationScheme);
+
+            var authProperties = new AuthenticationProperties();
+
+            await HttpContext.SignInAsync(
+                        CookieAuthenticationDefaults.AuthenticationScheme,
+                        new ClaimsPrincipal(claimsIdentity),
+                        authProperties);
             this.Response.Cookies.Append(MPGGN_COOKIE_NAME, name);
         }
 

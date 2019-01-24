@@ -1,5 +1,6 @@
 ﻿using Dapper;
 using MealPlanner.Data.Models;
+using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
 using System.Data.SqlClient;
@@ -18,10 +19,10 @@ namespace MealPlanner.Data.Repositories.Dapper
             return tagRepository;
         }
 
-        public MealRepository(string connectionString, ITagRepository tagRepository)
+        public MealRepository(IConfiguration config, ITagRepository tagRepository)
         {
-            this.connectionString = connectionString;
-            this.tagRepository = tagRepository;
+            this.connectionString = config["dbConnectionString"];
+             this.tagRepository = tagRepository;
         }
 
         public async Task<IEnumerable<Meal>> All(int groupId)

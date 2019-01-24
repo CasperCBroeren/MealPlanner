@@ -1,7 +1,6 @@
 using Joonasw.AspNetCore.SecurityHeaders;
 using MealPlanner.Data.Repositories;
 using MealPlanner.Data.Repositories.Dapper;
-using MealPlanner.Web.Controllers;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -20,13 +19,13 @@ namespace mealplanner
         public Startup(IHostingEnvironment env)
         {
             var builder = new ConfigurationBuilder()
-                .SetBasePath(env.ContentRootPath)
-                .AddJsonFile("config.json", optional: true, reloadOnChange: true)
-
+                .SetBasePath(env.ContentRootPath)  
                 .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
                 .AddJsonFile($"appsettings.{env.EnvironmentName}.json", optional: true)
 
                 .AddEnvironmentVariables();
+             
+
             Configuration = builder.Build();
         }
 
@@ -34,16 +33,15 @@ namespace mealplanner
 
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
-        {
-            var connectionString = Configuration.GetConnectionString("dbConnectionString");
+        { 
             services.TryAddSingleton<IHttpContextAccessor, HttpContextAccessor>();
 
-            services.TryAddTransient<ITagRepository>(s => new TagRepository(connectionString));
-            services.TryAddTransient<IIngredientRepository>(s => new IngredientRepository(connectionString));
-            services.TryAddTransient<IWeekplanningRepository>(s => new WeekplanningRepository(s.GetService<IMealRepository>(), connectionString));
-            services.TryAddTransient<IMealRepository>(s => new MealRepository(connectionString, s.GetService<ITagRepository>()));
-            services.TryAddTransient<IGroupRepository>(s => new GroupRepository(connectionString));
-            services.TryAddTransient<IBoughtIngredientRepository>(s => new BoughtIngredientRepository(connectionString));
+            services.TryAddTransient<ITagRepository, TagRepository>();
+            services.TryAddTransient<IIngredientRepository, IngredientRepository>();
+            services.TryAddTransient<IWeekplanningRepository, WeekplanningRepository>();
+            services.TryAddTransient<IMealRepository, MealRepository>();
+            services.TryAddTransient<IGroupRepository, GroupRepository>();
+            services.TryAddTransient<IBoughtIngredientRepository, BoughtIngredientRepository>();
             // Umi for urls
             services.AddUmi();
             // Add framework services.
@@ -51,8 +49,7 @@ namespace mealplanner
             services.AddAuthentication()
                .AddCookie(options =>
                {
-                   options.LoginPath = "/join";
-                   options.Cookie.Name = BaseController.MPGG_COOKIE_NAME;
+                   options.LoginPath = "/join"; 
                    options.SlidingExpiration = true; 
                });
             services.AddAuthorization(options =>
@@ -78,6 +75,7 @@ namespace mealplanner
                 {
                     HotModuleReplacement = true
                 });
+
             }
             else
             {

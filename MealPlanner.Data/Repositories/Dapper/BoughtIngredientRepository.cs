@@ -1,5 +1,6 @@
 ﻿using Dapper;
 using MealPlanner.Data.Models;
+using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
 using System.Data.SqlClient;
@@ -12,9 +13,9 @@ namespace MealPlanner.Data.Repositories.Dapper
     {
         private readonly string connectionString;
 
-        public BoughtIngredientRepository(string connectionstring)
+        public BoughtIngredientRepository(IConfiguration config)
         {
-            this.connectionString = connectionstring;
+            this.connectionString = config["dbConnectionString"];
         }
 
         public async Task<IEnumerable<BoughtIngredient>> GetForWeekAndYear(int year, int week, int groupId)

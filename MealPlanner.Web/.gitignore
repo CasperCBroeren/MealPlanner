@@ -253,4 +253,5 @@ _Pvt_Extensions
 .vscode/
 
 # sensitve configs*
-config.json
+config.json  
+./Key Vault/

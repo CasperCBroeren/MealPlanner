@@ -30,9 +30,6 @@
             },
             getGroupName: function () {
                 return this.$cookies.get('mpggn');
-            },
-            getGroupKey: function () {
-                return this.$cookies.get('mpgg');
             }
         }
     }
