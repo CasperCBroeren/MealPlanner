@@ -1,3 +1,4 @@
+using MealPlanner.Data.Models;
 using MealPlanner.Data.Repositories;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
@@ -31,14 +32,21 @@ namespace MealPlanner.Web.Controllers
         {
             if (!string.IsNullOrEmpty(groupName))
             {
-                if (await this.GroupRepository.ExistsByName(groupName))
+                if (await this.GroupRepository.GetByName(groupName) != null)
                 {
                     ViewBag.Error = "Helaas bestaat deze naam al";
                     return View("new");
                 }
-                var guid = await this.GroupRepository.AddNew(groupName);
-                await JoinGroup(guid, groupName);
-                return new RedirectResult("/");
+                var group = new Group()
+                {
+                    Name = groupName
+                };
+                if (await this.GroupRepository.Save(group) && group.GroupId.HasValue)
+                {
+                    await JoinGroup(group.GroupId.Value, groupName);
+
+                    return new RedirectResult("/");
+                }
             }
             return View("new");
         }
@@ -54,10 +62,10 @@ namespace MealPlanner.Web.Controllers
         {
             if (!string.IsNullOrEmpty(name))
             {
-                var groupGuid = await this.GroupRepository.GetByName(name);
-                if (!string.IsNullOrEmpty(groupGuid))
+                var group = await this.GroupRepository.GetByName(name);
+                if (group != null && group.GroupId.HasValue)
                 {
-                    await JoinGroup(groupGuid, name); 
+                    await JoinGroup(group.GroupId.Value, name);
                     return new RedirectResult("/");
                 }
             }
@@ -65,11 +73,11 @@ namespace MealPlanner.Web.Controllers
             return View("join");
         }
 
-        private async Task JoinGroup(string groupGuid, string name)
+        private async Task JoinGroup(int groupdid, string name)
         {
             var claims = new List<Claim>
                     {
-                        new Claim("GroupId", groupGuid),
+                        new Claim("GroupId", groupdid.ToString()),
                     };
 
             var claimsIdentity = new ClaimsIdentity(

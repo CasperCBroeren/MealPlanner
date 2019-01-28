@@ -1,6 +1,6 @@
 ﻿using Dapper;
+using MealPlanner.Data.Models;
 using Microsoft.Extensions.Configuration;
-using System;
 using System.Data.SqlClient;
 using System.Linq;
 using System.Threading.Tasks;
@@ -16,61 +16,41 @@ namespace MealPlanner.Data.Repositories.Dapper
             this.connectionString = config["dbConnectionString"];
         }
 
-        public async Task<string> AddNew(string name)
-        {
-            var guid = Guid.NewGuid();
-            using (var connection = new SqlConnection(this.connectionString))
-            {
-                var queryInsert = @"insert into Groups(GroupGuid, name) values (@guid, @name);
-                                        select SCOPE_IDENTITY();";
-                await connection.QueryAsync<int>(queryInsert, new { name = name, guid = guid }); 
-            }
-            return guid.ToString();
-        }
-
-        public async Task<bool> ExistsByName(string groupName)
-        {
-            var guid = Guid.NewGuid();
-            using (var connection = new SqlConnection(this.connectionString))
-            {
-                var query = @"select 1 from Groups where Name = @name";
-                var result = await connection.QueryAsync<int>(query, new { name = groupName });
-                return result.FirstOrDefault() == 1;
-            } 
-        }
-
-        public async Task<string> GetName(string groupGuid)
-        { 
-            using (var connection = new SqlConnection(this.connectionString))
-            {
-                var query = @"select name from Groups where GroupGuid = @guid";
-                var result = await connection.QueryAsync<string>(query, new { guid = groupGuid });
-                return result.FirstOrDefault();
-            }
-        }
-
-        public async Task<int> GetId(string groupGuid)
+        public async Task<bool> Save(Group item)
         {
             using (var connection = new SqlConnection(this.connectionString))
             {
-                var query = @"select groupId from Groups where GroupGuid = @guid";
-                var result = await connection.QueryAsync<int>(query, new { guid = groupGuid });
-                return result.FirstOrDefault();
-            }
-        }
-
-        public async Task<string> GetByName(string name)
-        {
-            using (var connection = new SqlConnection(this.connectionString))
-            {
-                var query = @"select GroupGuid from Groups where name = @name";
-                var result = await connection.QueryAsync<Guid>(query, new { name });
-                var guid = result.FirstOrDefault();
-                if (!guid.Equals(Guid.Empty))
+                if (item.GroupId.HasValue)
                 {
-                    return guid.ToString();
+                    var queryInsert = @"insert into Groups(GroupGuid, name) values (@guid, @name);
+                                        select SCOPE_IDENTITY();";
+                    var result = await connection.QueryAsync<int>(queryInsert, new { name = item.Name, guid = item.GroupId });
+                    if (result.Any())
+                    {
+                        item.GroupId = result.First();
+                    }
+                    return true;
+
                 }
-                return null;
+                else
+                {
+                    var queryUpdate = $"update groups set name=@name where id=@id and groupId=@id";
+
+                    var updateCommand = new SqlCommand(queryUpdate, connection);
+                    updateCommand.Parameters.Add(new SqlParameter("name", item.Name));
+                    updateCommand.Parameters.Add(new SqlParameter("id", item.GroupId)); 
+                    return await updateCommand.ExecuteNonQueryAsync() == 1;
+                }
+            }
+        } 
+
+        public async Task<Group> GetByName(string name)
+        {
+            using (var connection = new SqlConnection(this.connectionString))
+            {
+                var query = @"select GroupId, GroupGuid, Name, Created from Groups where name = @name";
+                var result = await connection.QueryAsync<Group>(query, new { name });
+                return result.FirstOrDefault();
             }
         }
     }

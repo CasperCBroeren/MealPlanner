@@ -11,7 +11,7 @@ namespace MealPlanner.Web.Controllers
          
         public async Task<int> GroupId()
         {
-            return await this.GroupRepository.GetId((this.User as ClaimsPrincipal).FindFirstValue("GroupId")); 
+            return int.Parse((this.User as ClaimsPrincipal).FindFirstValue("GroupId")); 
         }
 
         public IGroupRepository GroupRepository { get; }
