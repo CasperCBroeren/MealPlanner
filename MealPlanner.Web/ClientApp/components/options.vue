@@ -9,7 +9,7 @@
                  
                     <div class="form-group">
                         <label for="groupToken">
-                            Scan deze code in Google Authenticator of andere TOTP tool
+                            Scan deze code in Google Authenticator of andere one-time-password tool
                         </label><br />
                         <img v-bind:src="qrToken" />
                     </div>
