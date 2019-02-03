@@ -13,12 +13,9 @@ namespace MealPlanner.Web.Controllers
         {
             return int.Parse((this.User as ClaimsPrincipal).FindFirstValue("GroupId")); 
         }
-
-        public IGroupRepository GroupRepository { get; }
-
-        public BaseController(IGroupRepository groupRepository)
-        {
-            GroupRepository = groupRepository;
+         
+        public BaseController( )
+        { 
         }
     }
 }

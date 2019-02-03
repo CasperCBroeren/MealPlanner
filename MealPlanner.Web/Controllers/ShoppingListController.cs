@@ -12,7 +12,7 @@ namespace MealPlanner.Web.Controllers
     {
         private readonly IBoughtIngredientRepository boughtIngredientRepository;
 
-        public ShoppingListController(IGroupRepository groupRepository, IBoughtIngredientRepository boughtIngredientRepository) : base(groupRepository)
+        public ShoppingListController(IBoughtIngredientRepository boughtIngredientRepository)  
         {
             this.boughtIngredientRepository = boughtIngredientRepository;
         }

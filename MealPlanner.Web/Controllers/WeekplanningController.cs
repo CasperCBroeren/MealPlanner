@@ -14,7 +14,7 @@ namespace MealPlanner.Web.Controllers
     {
         private IWeekplanningRepository weekplanning;
 
-        public WeekplanningController(IGroupRepository groupRepository, IWeekplanningRepository weekplanningRepository) : base(groupRepository)
+        public WeekplanningController(IWeekplanningRepository weekplanningRepository)  
         {
             this.weekplanning = weekplanningRepository;
         } 

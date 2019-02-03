@@ -5,6 +5,7 @@ import HomePage from 'components/home-page'
 import Ingredients from 'components/ingredients'
 import Shoppinglist from './components/shoppinglist.vue';
 import Recipe from './components/recipe.vue';
+import Options from './components/options.vue';
 
 export const routes = [
     { path: '/', component: HomePage, display: 'Dashboard', style: 'fa fa-home', hideInMenu: true },
@@ -22,6 +23,7 @@ export const routes = [
     },
     { path: '/meals', component: Meals, display: 'Maaltijden', style: 'fa fa-utensils' },
     { path: '/ingredients', component: Ingredients, display: 'Ingrediënten', style: 'fa fa-lemon' },
+    { path: '/options', component: Options, display: 'Opties', style: 'fa fa-cog' },
     {
         path: '/shoppinglist/:year/:week', component: Shoppinglist, hideInMenu: true, props: (route) => ({
             year: route.params.year,

@@ -13,7 +13,7 @@ namespace MealPlanner.Web.Controllers
     {
         private IIngredientRepository ingredientRepository;
 
-        public IngredientsController(IGroupRepository groupRepository, IIngredientRepository ingredientRepository) : base(groupRepository)
+        public IngredientsController(IGroupRepository groupRepository, IIngredientRepository ingredientRepository)
         {
             this.ingredientRepository = ingredientRepository;
         }

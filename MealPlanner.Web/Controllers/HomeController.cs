@@ -7,13 +7,17 @@ using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
 using System.Security.Claims;
 using System.Threading.Tasks;
+using TwoFactorAuthNet;
 
 namespace MealPlanner.Web.Controllers
 {
     public class HomeController : BaseController
     {
-        public HomeController(IGroupRepository groupRepository) : base(groupRepository)
+        public IGroupRepository groupRepository { get; }
+
+        public HomeController(IGroupRepository groupRepository) 
         {
+            this.groupRepository = groupRepository;
         }
         [Authorize(Policy = "GroupOnly")]
         public IActionResult Index()
@@ -32,7 +36,7 @@ namespace MealPlanner.Web.Controllers
         {
             if (!string.IsNullOrEmpty(groupName))
             {
-                if (await this.GroupRepository.GetByName(groupName) != null)
+                if (await this.groupRepository.GetByName(groupName) != null)
                 {
                     ViewBag.Error = "Helaas bestaat deze naam al";
                     return View("new");
@@ -41,14 +45,50 @@ namespace MealPlanner.Web.Controllers
                 {
                     Name = groupName
                 };
-                if (await this.GroupRepository.Save(group) && group.GroupId.HasValue)
+                if (await this.groupRepository.Save(group) && group.GroupId.HasValue)
                 {
                     await JoinGroup(group.GroupId.Value, groupName);
 
-                    return new RedirectResult("/");
+                    return new RedirectResult("/validateToken");
                 }
             }
             return View("new");
+        } 
+
+        [Route("validateToken"), HttpGet]
+        [Authorize(Policy = "GroupOnly")]
+        public async Task<IActionResult> StartValidateToken()
+        {
+            var group = (await this.groupRepository.GetById(await this.GroupId()));
+            var tfa = new TwoFactorAuth(group.Name);
+            if (string.IsNullOrWhiteSpace(group.Secret))
+            {
+                group.Secret = tfa.CreateSecret(160);
+                await this.groupRepository.Save(group);
+            }
+            
+            var qrToken = tfa.GetQrCodeImageAsDataUri("Maaltijdplanner", group.Secret);
+
+            return View("validateToken", qrToken);
+        }
+
+        [Route("validateToken"), HttpPost]
+        [Authorize(Policy = "GroupOnly")]
+        public async Task<IActionResult> ValidateToken([FromForm] string token)
+        {
+            var group = (await this.groupRepository.GetById(await this.GroupId()));
+            var tfa = new TwoFactorAuth(group.Name);
+            if (tfa.VerifyCode(group.Secret, token))
+            {
+                return new RedirectResult("/");
+            }
+            else
+            {
+                var qrToken = tfa.GetQrCodeImageAsDataUri("Maaltijdplanner", group.Secret);
+                ViewBag.Error = "We konden de token niet valideren, probeer het opnieuw";
+                return View("validateToken", qrToken);
+
+            }
         }
 
         [Route("join"), HttpGet]
@@ -58,18 +98,36 @@ namespace MealPlanner.Web.Controllers
         }
 
         [Route("join"), HttpPost]
-        public async Task<IActionResult> JoinByName([FromForm]string name)
+        public async Task<IActionResult> JoinByName([FromForm]string name, [FromForm] string token)
         {
-            if (!string.IsNullOrEmpty(name))
+            if (!string.IsNullOrWhiteSpace(name))
             {
-                var group = await this.GroupRepository.GetByName(name);
-                if (group != null && group.GroupId.HasValue)
+                var group = await this.groupRepository.GetByName(name);
+                if (!string.IsNullOrWhiteSpace(token))
                 {
-                    await JoinGroup(group.GroupId.Value, name);
-                    return new RedirectResult("/");
+                    var tfa = new TwoFactorAuth(group.Name);
+                    if (tfa.VerifyCode(group.Secret, token))
+                    {
+                        if (group != null && group.GroupId.HasValue)
+                        {
+                            await JoinGroup(group.GroupId.Value, name);
+                            return new RedirectResult("/");
+                        }
+                    }
+                    else
+                    {
+                        ViewBag.Error = "Je token is niet geledig";
+                    }
+                }
+                else
+                {
+                    ViewBag.Error = "Vul ook de token van je authenticator in";
                 }
             }
-            ViewBag.Error = "Helaas kennen we deze groep niet";
+            else
+            {
+                ViewBag.Error = "Helaas kennen we deze groep niet";
+            }
             return View("join");
         }
 

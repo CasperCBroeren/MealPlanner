@@ -21,7 +21,7 @@
     import HomePage from './home-page'
     import WeekPlanning from './weekplanning.vue'
     import NavMenu from './nav-menu'
-
+    import Options from './options.vue'
 
     Vue.component('autocomplete', Autocomplete);
     Vue.component('tagCollection', TagCollection);
@@ -30,6 +30,7 @@
     Vue.component('weekplanning', WeekPlanning);
     Vue.component('home-page', HomePage);
     Vue.component('nav-menu', NavMenu);
+    Vue.component('options', Options);
 
     export default {
         data() {

@@ -5,17 +5,16 @@
 
             <h1>Welkom</h1>
             <p>
-                We kennen elkaar nog niet! Voer een groepscode in of maak je eigen groep aan <a href="/new">hier</a>.
-                of voer de groepnaam in en hervat
-
+                Voer een groepsnaam  en je one-time-password van uit je app in. Ben je nieuw dan maak je eigen groep aan <a href="/new">hier</a>.  
             </p>
         </div> 
             <div class="col-sm-6 align-middle">
                 <form action="join" method="post">
                     <div class="input-group input-group-lg">
-                        <input type="text" maxlength="100" name="name" id="name" placeholder="Naam van de groep" class="form-control" />
+                        <input type="text" maxlength="100" name="name" id="name" placeholder="Groep" class="form-control" /> 
+                        <input type="password" maxlength="6" name="token" id="token" placeholder="One-time-password" class="form-control" />
                         <div class="input-group-append">
-                            <button type="submit" class="btn btn-primary">hervat</button>
+                            <button type="submit" class="btn btn-primary">Login</button>
                         </div>
                     </div> 
                     @if (!string.IsNullOrEmpty(ViewBag.Error))

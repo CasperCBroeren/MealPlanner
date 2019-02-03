@@ -12,7 +12,7 @@ namespace MealPlanner.Web.Controllers
     {
         private readonly ITagRepository tagRepository;
 
-        public TagController(IGroupRepository groupRepository, ITagRepository tagRepository) : base(groupRepository)
+        public TagController(ITagRepository tagRepository) 
         {
             this.tagRepository = tagRepository;
         }

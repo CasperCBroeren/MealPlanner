@@ -13,7 +13,7 @@ namespace MealPlanner.Web.Controllers
     {
         private IMealRepository mealRepository;
 
-        public MealController(IGroupRepository groupRepository, IMealRepository mealRepository): base(groupRepository)
+        public MealController( IMealRepository mealRepository)
         {
             this.mealRepository = mealRepository;
         }
