@@ -10,6 +10,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Logging;
+using System;
 using Umi.Core;
 
 namespace mealplanner
@@ -50,7 +51,8 @@ namespace mealplanner
                .AddCookie(options =>
                {
                    options.LoginPath = "/join"; 
-                   options.SlidingExpiration = true; 
+                   options.SlidingExpiration = true;
+                   options.ExpireTimeSpan = TimeSpan.FromDays(5);
                });
             services.AddAuthorization(options =>
             {

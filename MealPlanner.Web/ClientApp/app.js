@@ -11,7 +11,7 @@ import VueCookies from 'vue-cookies'
 Vue.use(VueCookies);
  
 Vue.use(VueAppInsights, {
-    id: '2b8c5f23-23fa-4234-90f6-11de0acd37b4',
+    id: '1f7db19a-d2c9-46b4-9e21-ca7d71f92684',
     router
 });
 Vue.prototype.$http = axios;
