@@ -85,7 +85,7 @@ namespace mealplanner
             app.UseCsp(csp =>
             {
                 csp.ByDefaultAllow.FromSelf();
-                csp.AllowScripts.FromSelf().From("vo.msecnd.net").From("dc.services.visualstudio.com");
+                csp.AllowScripts.FromSelf().From("*.vo.msecnd.net").From("dc.services.visualstudio.com");
                 csp.AllowConnections.ToSelf().To("dc.services.visualstudio.com");
                 csp.AllowFonts.From("data:").FromSelf();
                 csp.AllowImages.From("data:").FromSelf();
