@@ -14,7 +14,7 @@
             <img src="@Model" />
             <form asp-controller="Home" asp-action="ValidateToken">
                 <div class="input-group input-group-lg">
-                    <input type="text" name="token" maxlength="6" class="form-control" placeholder="One-time-password" required autocomplete="off" />
+                    <input type="password" name="token" maxlength="6" class="form-control" placeholder="One-time-password" required autocomplete="off" />
                     <div class="input-group-append">
                         <button class="btn btn-outline-secondary" type="submit" id="button-addon2">Valideer</button>
                     </div>

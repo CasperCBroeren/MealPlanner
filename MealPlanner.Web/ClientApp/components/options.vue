@@ -14,7 +14,7 @@
                         <img v-bind:src="qrToken" />
                     </div>
                     <div class="input-group input-group-lg col-4" >
-                        <input type="text" v-model="validationTotp" maxlength="6" name="validation" id="validation" placeholder="Validatie code" class="form-control" />
+                        <input type="password" v-model="validationTotp" maxlength="6" name="validation" id="validation" placeholder="Validatie code" class="form-control" />
                         <div class="input-group-append">
                             <button  v-on:click="checkCode" class="btn btn-primary">Controleer</button>
                         </div>
