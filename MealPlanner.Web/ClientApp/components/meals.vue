@@ -311,8 +311,7 @@
         async created() {
 
             try {
-                let response = await this.$http.get('/api/Meal/All')
-                console.log(response)
+                let response = await this.$http.get('/api/Meal/All') 
                 if (response.status == 200) {
                     this.meals = response.data;
                 }
