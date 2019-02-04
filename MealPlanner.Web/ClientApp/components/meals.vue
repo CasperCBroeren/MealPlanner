@@ -13,6 +13,12 @@
                 <form v-on:submit.prevent="stopSubmit" v-if="singleItem" class="">
                     <h3 v-if="editItem.created">Wijzig maaltijd</h3>
                     <h3 v-if="!editItem.created">Nieuwe maaltijd</h3>
+                    <div class="form-group" v-if="editItem.created">
+                        <label for="mealName">
+                            Aangemaakt op:
+                        </label><br />
+                        {{simpleDate(editItem.created)}}
+                    </div>
                     <div class="form-group">
                         <label for="mealName">
                             Naam:
@@ -88,13 +94,12 @@
 
         <div class="row py-3">
             <div class="col-12">
-                <table class="items table" v-if="meals && meals.length > 0 && !singleItem">
+                <table class="items table table-responsive" v-if="meals && meals.length > 0 && !singleItem">
                     <thead>
                         <tr>
                             <th>Naam</th>
                             <th>Tags</th>
-                            <th>Ingredienten</th>
-                            <th>Aangemaakt op</th>
+                            <th class="d-none d-sm-block">Ingredienten</th> 
                             <th>Acties</th>
                         </tr>
                     </thead>
@@ -103,8 +108,7 @@
                         <tr v-for="item in meals" v-on:click="edit(item)" v-bind:key="item.id">
                             <td>{{ item.name }}</td>
                             <td>{{ renderTags(item.tags)}}</td>
-                            <td>{{ renderIngredients(item.ingredients)}}</td>
-                            <td>{{ simpleDate(item.created)}}</td>
+                            <td class="d-none d-sm-block">{{ renderIngredients(item.ingredients)}}</td> 
                             <td>
                                 <a href="#edit" class="btn btn-info" v-on:click="edit(item)">Bewerk</a>
                             </td>

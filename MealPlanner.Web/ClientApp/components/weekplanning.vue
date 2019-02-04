@@ -1,7 +1,7 @@
 <template>
     <div class="container">
         <div class="row">
-            <div class="col-sm">
+            <div class="col-sm-12">
                 <h2>Week planning</h2>
                 <p>Plan een week met maaltijden en krijg een handige uitdraai van alle ingredienten</p>
                 <nav aria-label="Week">
@@ -12,29 +12,30 @@
                         <li class="page-item "><a class="page-link" :href="'/weekplanning/' + nextYear + '/' + nextWeek">&gt;&gt;</a></li>
                     </ul>
                 </nav>
-                <div class="card-group">
-                    <div v-for="day in meals" class="card" style="width:18rem">
-                        <div class="card-header">
-                            {{day.dayName}}
-                        </div>
-                        <div class="card-body" v-on:click="startMealSelection(day)">
-                            <p v-if="day.meal" class="card-text">{{day.meal.name}}</p>
-                            <p v-else class="card-text"><small class="text-muted">Deze dag is nog niet ingevuld</small></p>
-                        </div>
-                        <div class="card-footer">
-                            <div class="btn-group btn-group-sm">
-                                <button type="button" class="btn btn-info btn-sm" v-on:click="startMealSelection(day)">Bewerk</button>
-                                <a :href="'/meal/'+day.meal.id+'/' +year+'/' +week " v-if="day.meal" class="btn btn-infoAlt btn-sm btn-block">Bekijk</a>
-                            </div>
+            </div>
+            <div class="card-group col-sm-12">
+                <div v-for="day in meals" class="card" style="width:18rem">
+                    <div class="card-header">
+                        {{day.dayName}}
+                    </div>
+                    <div class="card-body" v-on:click="startMealSelection(day)">
+                        <p v-if="day.meal" class="card-text">{{day.meal.name}}</p>
+                        <p v-else class="card-text"><small class="text-muted">Deze dag is nog niet ingevuld</small></p>
+                    </div>
+                    <div class="card-footer">
+                        <div class="btn-group btn-group-sm">
+                            <button type="button" class="btn btn-info btn-sm" v-on:click="startMealSelection(day)">Bewerk</button>
+                            <a :href="'/meal/'+day.meal.id+'/' +year+'/' +week " v-if="day.meal" class="btn btn-infoAlt btn-sm btn-block">Bekijk</a>
                         </div>
                     </div>
                 </div>
-                <a :href="'/shoppinglist/' +year+'/' +week " 
-                   class="btn btn-secondary float-left mt-3 btn-sm">
-                Boodschappenlijst</a> 
-
             </div>
-        </div> 
+            <a :href="'/shoppinglist/' +year+'/' +week "
+               class="btn btn-secondary float-left mt-3 btn-sm">
+                Boodschappenlijst
+            </a>
+
+        </div>
 
         <div class="modal fade show" tabindex="-1" role="dialog" v-if="decideMealForDay">
             <div class="modal-dialog modal-dialog-centered" role="document">

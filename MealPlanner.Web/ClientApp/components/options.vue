@@ -5,7 +5,7 @@
 
         <p>Hier is het mogelijk diverse zaken te regelen voor je maaltijdplan groep </p>
         <div class="row">
-            <div class="col-sm">
+            <div class="col-sm-12">
                  
                     <div class="form-group">
                         <label for="groupToken">
@@ -13,7 +13,7 @@
                         </label><br />
                         <img v-bind:src="qrToken" />
                     </div>
-                    <div class="input-group input-group-lg col-4" >
+                    <div class="input-group input-group-lg col-sm-4" >
                         <input type="password" v-model="validationTotp" maxlength="6" name="validation" id="validation" placeholder="Validatie code" class="form-control" />
                         <div class="input-group-append">
                             <button  v-on:click="checkCode" class="btn btn-primary">Controleer</button>

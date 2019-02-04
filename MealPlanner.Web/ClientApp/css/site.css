@@ -23,17 +23,18 @@
             padding: 1px 4px;
             position: inline-block;
         }
-
+ 
 .ingredientsCollection span {
     background-color: #81c8d4;
     padding: .5% 0.5%;
-    margin: 1.25% 0.5%;
+    margin: 0.25% 0.5%;
     border-radius: 0.25rem;
     color: white;
     display: inline-block;
     max-width: 20%;
     position: relative;
 }
+
 
     .ingredientsCollection span input {
         border: 0px solid black;
@@ -53,6 +54,16 @@
         right: 5px;
     }
 
+@media only screen and (max-width: 680px) {
+    .ingredientsCollection span { 
+        max-width: 45%;
+        
+    } 
+    .ingredientsCollection span input {
+         
+        width: 40%; 
+    }
+}
 .form textarea {
     width: 100%;
 }

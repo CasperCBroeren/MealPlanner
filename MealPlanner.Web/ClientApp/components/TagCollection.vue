@@ -52,7 +52,3 @@
 
     }
 </script>
-<style>
-  
-</style>
-
