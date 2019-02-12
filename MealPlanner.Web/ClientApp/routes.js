@@ -6,11 +6,13 @@ import Ingredients from 'components/ingredients'
 import Shoppinglist from './components/shoppinglist.vue';
 import Recipe from './components/recipe.vue';
 import Options from './components/options.vue';
+import Login from './components/login.vue';
+import NewGroup from './components/newgroup.vue';
 
 export const routes = [
-    { path: '/', component: HomePage, display: 'Dashboard', style: 'fa fa-home', hideInMenu: true },
+    { path: '/', component: HomePage, display: 'Dashboard', style: 'fa fa-home', hideInMenu: true, meta: { public: false, hideMenu: false } },
     {
-        path: '/weekplanning', component: WeekPlanning, display: 'Weekplan', style: 'fa fa-list-ul', props:
+        path: '/weekplanning', component: WeekPlanning, display: 'Weekplan', style: 'fa fa-list-ul', meta: { public: false, hideMenu: false }, props:
             (route) => ({
                 year: route.params.year == null ? new Date().getFullYear() : parseInt(route.params.year),
                 week: route.params.week == null ? new Date().getWeek() : parseInt(route.params.week)
@@ -21,17 +23,19 @@ export const routes = [
             }
         ]
     },
-    { path: '/meals', component: Meals, display: 'Maaltijden', style: 'fa fa-utensils' },
-    { path: '/ingredients', component: Ingredients, display: 'Ingrediënten', style: 'fa fa-lemon' },
-    { path: '/options', component: Options, display: 'Opties', style: 'fa fa-cog' },
+    { path: '/meals', component: Meals, display: 'Maaltijden', style: 'fa fa-utensils', meta: { public: false, hideMenu: false } },
+    { path: '/ingredients', component: Ingredients, display: 'Ingrediënten', style: 'fa fa-lemon', meta: { public: false, hideMenu: false } },
+    { path: '/options', component: Options, display: 'Opties', style: 'fa fa-cog', meta: { public: false, hideMenu: false } },
+    { path: '/login', component: Login, hideInMenu: true, hideMenu: true, meta: { public: true, hideMenu: true } },
+    { path: '/new', component: NewGroup, hideInMenu: true, hideMenu: true, meta: { public: true, hideMenu: true } },
     {
-        path: '/shoppinglist/:year/:week', component: Shoppinglist, hideInMenu: true, props: (route) => ({
+        path: '/shoppinglist/:year/:week', component: Shoppinglist, hideInMenu: true, hideMenu: false, meta: { public: false, hideMenu: false  }, props: (route) => ({
             year: route.params.year,
             week: route.params.week
         })
     },
     {
-        path: '/meal/:id/:year/:week', component: Recipe, hideInMenu: true, props: (route) => ({
+        path: '/meal/:id/:year/:week', component: Recipe, hideInMenu: true, hideMenu: false, meta: { public: false, hideMenu: false  }, props: (route) => ({
             id: route.params.id,
             year: route.params.year,
             week: route.params.week

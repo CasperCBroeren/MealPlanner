@@ -24,17 +24,6 @@
     <ProjectReference Include="..\MealPlanner.Data\MealPlanner.Data.csproj" />
   </ItemGroup>
   <ItemGroup>
-    <Content Update="Views\Home\Join.cshtml">
-      <Pack>$(IncludeRazorContentInPack)</Pack>
-    </Content>
-    <Content Update="Views\Home\ValidateToken.cshtml">
-      <Pack>$(IncludeRazorContentInPack)</Pack>
-    </Content>
-    <Content Update="Views\Home\New.cshtml">
-      <Pack>$(IncludeRazorContentInPack)</Pack>
-    </Content>
-  </ItemGroup>
-  <ItemGroup>
     <Folder Include="ClientApp\store\" />
   </ItemGroup>
   <ItemGroup>

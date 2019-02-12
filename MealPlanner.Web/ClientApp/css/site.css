@@ -9,7 +9,7 @@
     .tagCollection li {
         display: inline-block;
         border-radius: .25rem;
-        background-color: #81c8d4;
+        background-color: #FDB62F;
         padding: 0.25% 2.5%;
         margin: 0.25% 0.5%;
         font-variant: small-caps;
@@ -23,13 +23,13 @@
             padding: 1px 4px;
             position: inline-block;
         }
- 
+
 .ingredientsCollection span {
-    background-color: #81c8d4;
+    background-color: #FDB62F;
     padding: .5% 0.5%;
     margin: 0.25% 0.5%;
     border-radius: 0.25rem;
-    color: white;
+    color: black;
     display: inline-block;
     max-width: 20%;
     position: relative;
@@ -38,11 +38,11 @@
 
     .ingredientsCollection span input {
         border: 0px solid black;
-        background-color: #a3d7e0;
+        background-color: #FCE2B3;
         width: 30%;
         border-radius: .25rem;
         padding-left: 4px;
-        color: white;
+        color: black;
     }
 
 
@@ -55,38 +55,54 @@
     }
 
 @media only screen and (max-width: 680px) {
-    .ingredientsCollection span { 
+    .ingredientsCollection span {
         max-width: 45%;
-        
-    } 
-    .ingredientsCollection span input {
-         
-        width: 40%; 
     }
+
+        .ingredientsCollection span input {
+            width: 40%;
+        }
 }
+
 .form textarea {
     width: 100%;
 }
 
+a {
+    color: #88B337;
+}
+
 .btn-primary {
-    background-color: #2595a0;
+    background-color: #88B337;
     border: 0px;
 }
+
+    .btn-primary:hover {
+        background: #638724;
+    }
+
+    .btn-primary:active, .btn-primary:focus {
+        background: #a0d83f;
+    }
 
 .modal {
     display: block;
 }
-.btn-infoAlt {
-    background: #17b875;
+
+.btn-info {
+    background: #E5E5E5;
     color: #ffffff;
+    border-color: #DEDEDE;
+    color: #6c757d;
 }
 
-    .btn-infoAlt:hover, .btn-infoAlt:focus, .btn-infoAlt:active, .btn-infoAlt.active, .open > .dropdown-toggle.btn-infoAlt {
-        background: #16a268;
+    .btn-info:hover, .btn-info:focus, .btn-infoAlt:active, .btn-infoAlt.active, .open > .dropdown-toggle.btn-infoAlt {
+        background: #DEDEDE;
         color: #ffffff;
+        border-color: white;
     }
 
-    .btn-infoAlt:active, .btn-infoAlt.active {
-        background: #16a268;
-        box-shadow: none;
-    }
+.btn-infoAlt:active, .btn-infoAlt.active {
+    background: #DEDEDE;
+    box-shadow: none;
+}

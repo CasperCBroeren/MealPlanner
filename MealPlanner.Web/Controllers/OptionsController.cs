@@ -5,6 +5,7 @@ using MealPlanner.Data.Models;
 using MealPlanner.Data.Repositories;
 using Microsoft.AspNetCore.Authorization;
 using TwoFactorAuthNet;
+using Newtonsoft.Json.Linq;
 
 namespace MealPlanner.Web.Controllers
 {
@@ -36,19 +37,17 @@ namespace MealPlanner.Web.Controllers
             }); 
         }
                 
-        [HttpGet("[action]/{validation}")]
-        public async Task<ActionResult> Validate(string validation)
+        [HttpGet("[action]")]
+        public async Task<ActionResult> Validate([FromBody] JObject validation)
         {
             var group = (await this.groupRepository.GetById(await this.GroupId()));
             var tfa = new TwoFactorAuth(group.Name); 
-            if (tfa.VerifyCode(group.Secret, validation))
+            if (tfa.VerifyCode(group.Secret, validation.Property("token").Value.ToString()))
             {
-                return Ok("CORRECT");
+                return Ok("Correct, klaar om te gebruiken");
             }
-            return Ok("INCORRECT");
-        }
-
-         
+            return Ok("Validatie is incorrect");
+        } 
     }
 
 }
