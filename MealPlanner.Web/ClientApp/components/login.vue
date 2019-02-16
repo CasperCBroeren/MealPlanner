@@ -60,8 +60,9 @@ export default {
                         name: this.name,
                         token: this.token
                     })
-                if (response.data == "ok") {
-                    $cookies.set('mpggn', this.name);
+                if (response.data.token) {
+                    localStorage.setItem("jwtToken", response.data.token);
+                    localStorage.setItem("groupName", response.data.name);
                     this.$router.push("/");
                 }
                 else {

@@ -35,7 +35,7 @@
                 this.collapsed = !this.collapsed;
             },
             getGroupName: function () {
-                return this.$cookies.get('mpggn');
+                return localStorage.getItem('groupName');
             }
         }
     }

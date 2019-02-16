@@ -11,9 +11,10 @@ let router = new VueRouter({
 })
 
 router.beforeEach((to, from, next) => {
-    
-    var cookie = $cookies.get('mpggn');
-    if (cookie != null
+
+    var token = localStorage.getItem("jwtToken");
+    // todo validate token on server
+    if (token != null
         || to.matched.some(record => record.meta.public)) {
         next();
     }

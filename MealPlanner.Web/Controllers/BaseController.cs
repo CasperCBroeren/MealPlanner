@@ -6,9 +6,7 @@ using System.Threading.Tasks;
 namespace MealPlanner.Web.Controllers
 {
     public class BaseController : Controller
-    { 
-        public const string MPGGN_COOKIE_NAME = "mpggn";
-         
+    {     
         public async Task<int> GroupId()
         {
             return int.Parse((this.User as ClaimsPrincipal).FindFirstValue("GroupId")); 

@@ -1,12 +1,14 @@
 using MealPlanner.Data.Models;
 using MealPlanner.Data.Repositories;
-using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Configuration;
+using Microsoft.IdentityModel.Tokens;
 using Newtonsoft.Json.Linq;
-using System.Collections.Generic;
+using System;
+using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
+using System.Text;
 using System.Threading.Tasks;
 using TwoFactorAuthNet;
 
@@ -15,11 +17,14 @@ namespace MealPlanner.Web.Controllers
     [Route("api/[controller]")]
     public class GroupController : BaseController
     {
-        public IGroupRepository groupRepository { get; }
+        private readonly IGroupRepository groupRepository;
+        private readonly IConfiguration configuration;
 
-        public GroupController(IGroupRepository groupRepository)
+        public GroupController(IGroupRepository groupRepository,
+                               IConfiguration config)
         {
             this.groupRepository = groupRepository;
+            configuration = config;
         }
 
         [Route("create/{groupName}")]
@@ -38,18 +43,34 @@ namespace MealPlanner.Web.Controllers
                     Secret = tfa.CreateSecret(160)
                 };
                 if (await this.groupRepository.Save(group) && group.GroupId.HasValue)
-                {
-                    await JoinGroup(group.GroupId.Value, groupName);
-
+                { 
+                    var jwt = JoinGroupJwtBased(group);
                     return new JsonResult(new
                     {
                         name = group.Name,
-                        qrCode = tfa.GetQrCodeImageAsDataUri(group.Name, group.Secret)
+                        qrCode = tfa.GetQrCodeImageAsDataUri(group.Name, group.Secret),
+                        token = jwt
                     });
 
                 }
             }
             return Ok("Er is geen naam ontvangen");
+        }
+
+        private string JoinGroupJwtBased(Group group)
+        {
+            var tokenHandler = new JwtSecurityTokenHandler();
+            var key = Encoding.ASCII.GetBytes(configuration["jwtSecret"]);
+            var tokenDiscriptor = new SecurityTokenDescriptor {
+                Subject = new ClaimsIdentity(new Claim[]{
+                    new Claim("GroupId", group.GroupId.ToString())
+                }),
+                Expires = DateTime.UtcNow.AddDays(7),
+                SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha512Signature)
+            };
+
+            var token = tokenHandler.CreateToken(tokenDiscriptor);
+            return tokenHandler.WriteToken(token);
         }
 
         [Route("getValidationToken"), HttpGet]
@@ -96,9 +117,13 @@ namespace MealPlanner.Web.Controllers
                     if (tfa.VerifyCode(group.Secret, payload.Property("token").Value.ToString()))
                     {
                         if (group != null && group.GroupId.HasValue)
-                        {
-                            await JoinGroup(group.GroupId.Value, payload.Property("name").Value.ToString());
-                            return Ok("ok");
+                        { 
+                            var jwt = JoinGroupJwtBased(group);
+                            return new JsonResult(new
+                            {
+                                name = group.Name, 
+                                token = jwt
+                            });
                         }
                     }
                     else
@@ -114,24 +139,6 @@ namespace MealPlanner.Web.Controllers
 
             return Ok("Helaas kennen we deze groep niet");
            
-        }
-        private async Task JoinGroup(int groupdid, string name)
-        {
-            var claims = new List<Claim>
-                    {
-                        new Claim("GroupId", groupdid.ToString()),
-                    };
-
-            var claimsIdentity = new ClaimsIdentity(
-                claims, CookieAuthenticationDefaults.AuthenticationScheme);
-
-            var authProperties = new AuthenticationProperties();
-
-            await HttpContext.SignInAsync(
-                        CookieAuthenticationDefaults.AuthenticationScheme,
-                        new ClaimsPrincipal(claimsIdentity),
-                        authProperties);
-            this.Response.Cookies.Append(MPGGN_COOKIE_NAME, name);
-        }
+        } 
     }
 }

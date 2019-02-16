@@ -1,7 +1,7 @@
 using Joonasw.AspNetCore.SecurityHeaders;
 using MealPlanner.Data.Repositories;
 using MealPlanner.Data.Repositories.Dapper;
-using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
@@ -10,7 +10,8 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Logging;
-using System;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
 using Umi.Core;
 
 namespace mealplanner
@@ -20,13 +21,15 @@ namespace mealplanner
         public Startup(IHostingEnvironment env)
         {
             var builder = new ConfigurationBuilder()
-                .SetBasePath(env.ContentRootPath)  
+                .SetBasePath(env.ContentRootPath)
                 .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
-                .AddJsonFile($"appsettings.{env.EnvironmentName}.json", optional: true)
-
+                .AddJsonFile($"appsettings.{env.EnvironmentName}.json", optional: true) 
                 .AddEnvironmentVariables();
-             
 
+            if (!env.IsDevelopment())
+            {
+                builder.AddAzureKeyVault("https://maaltijdplanner.vault.azure.net");
+            }
             Configuration = builder.Build();
         }
 
@@ -34,7 +37,7 @@ namespace mealplanner
 
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
-        { 
+        {
             services.TryAddSingleton<IHttpContextAccessor, HttpContextAccessor>();
 
             services.TryAddTransient<ITagRepository, TagRepository>();
@@ -47,23 +50,36 @@ namespace mealplanner
             services.AddUmi();
             // Add framework services.
             services.AddMvc();
-            services.AddAuthentication()
-               .AddCookie(options =>
-               {
-                   options.LoginPath = "/join"; 
-                   options.SlidingExpiration = true;
-                   options.ExpireTimeSpan = TimeSpan.FromDays(5);
-               });
+
+            services.AddAuthentication(options =>
+           {
+               options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+               options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+
+           })
+               .AddJwtBearer(options =>
+              {
+                  options.RequireHttpsMetadata = false;
+                  options.SaveToken = true;
+                  options.TokenValidationParameters = new TokenValidationParameters()
+                  {
+                      ValidateIssuerSigningKey = true,
+                      IssuerSigningKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(Configuration["jwtSecret"])),
+                      ValidateAudience = false,
+                      ValidateIssuer = false
+                  };
+              });
             services.AddAuthorization(options =>
             {
                 options.AddPolicy("GroupOnly", policy =>
                 {
                     policy.RequireClaim("GroupId");
-                    policy.AuthenticationSchemes.Add(CookieAuthenticationDefaults.AuthenticationScheme);
+                    policy.AuthenticationSchemes.Add(JwtBearerDefaults.AuthenticationScheme);
                 });
             });
 
         }
+
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory)

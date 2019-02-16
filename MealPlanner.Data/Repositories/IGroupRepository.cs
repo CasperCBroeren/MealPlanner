@@ -1,5 +1,4 @@
 ﻿using MealPlanner.Data.Models;
-using System;
 using System.Threading.Tasks;
 
 namespace MealPlanner.Data.Repositories

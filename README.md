@@ -4,8 +4,7 @@ A  mealplanner for use at home with a bunch of people. Besides a practical use i
 ### Demo
 http://maaltijdplanner.azurewebsites.net/
 
-### Roadmap
-- Switch authentication from cookie to JWT
+### Roadmap 
 - Introduce service worker and start caching data
 - PWA time
 - Extra functionality
