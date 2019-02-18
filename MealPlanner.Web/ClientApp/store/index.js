@@ -5,7 +5,33 @@ Vue.use(Vuex)
 
 export default new Vuex.Store({
     state: {
-        token: localStorage.getItem('token') || ''
+        jwtToken: null,
+        groupName: null
+    },
+    mutations: {
+        login(state, payload) { 
+            state.jwtToken = payload.jwt;
+            state.groupName = payload.name;
+            localStorage.setItem('jwtToken', payload.jwt);
+            localStorage.setItem('groupName', payload.name);
+        },
+        logout(state) {
+            state.jwtToken = null;
+            state.groupName = null;
+
+            localStorage.removeItem('jwtToken');
+            localStorage.removeItem('groupName');
+        },
+        initialiseStore(state) {
+             
+            if (!state.jwtToken &&
+                localStorage.getItem('jwtToken') &&
+                localStorage.getItem('groupName')) {
+                
+                state.jwtToken = localStorage.getItem('jwtToken');
+                state.groupName = localStorage.getItem('groupName'); 
+            }
+        }
     }
 });
 

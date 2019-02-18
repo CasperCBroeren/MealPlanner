@@ -29,13 +29,13 @@
                 var $route = this.$route;
                 var theRoute = this.routes.find(function (x) { return x.path.toLowerCase().indexOf($route.path.toLowerCase()) > -1 });
                 
-                return theRoute.meta.hideMenu ? false : true;
+                return theRoute != null && theRoute.meta.hideMenu ? false : true;
             },
             toggleCollapsed: function (event) {
                 this.collapsed = !this.collapsed;
             },
-            getGroupName: function () {
-                return localStorage.getItem('groupName');
+            getGroupName: function () { 
+                return this.$store.state.groupName;
             }
         }
     }

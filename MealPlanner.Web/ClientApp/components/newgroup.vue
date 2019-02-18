@@ -89,7 +89,10 @@ export default {
                     this.qrCode = response.data.qrCode;
                     this.newGroupName = response.data.name;
                     this.error = null;
-                    localStorage.setItem("jwtToken", response.data.token);
+                    this.$store.commit('login', {
+                        jwt: response.data.token,
+                        name: response.data.name
+                    });
                 }
                 else {
                     this.error = response.data;

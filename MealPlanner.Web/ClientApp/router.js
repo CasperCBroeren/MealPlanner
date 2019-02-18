@@ -2,6 +2,7 @@ import Vue from 'vue'
 import VueRouter from 'vue-router'
 
 import { routes } from './routes'
+import store from './store'
 
 Vue.use(VueRouter);
 
@@ -11,8 +12,9 @@ let router = new VueRouter({
 })
 
 router.beforeEach((to, from, next) => {
-
-    var token = localStorage.getItem("jwtToken");
+    store.commit('initialiseStore');
+    var token = store.state.jwtToken;
+    console.log('Token: '+token)
     // todo validate token on server
     if (token != null
         || to.matched.some(record => record.meta.public)) {

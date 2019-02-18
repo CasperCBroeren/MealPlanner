@@ -61,9 +61,11 @@ export default {
                         token: this.token
                     })
                 if (response.data.token) {
-                    localStorage.setItem("jwtToken", response.data.token);
-                    localStorage.setItem("groupName", response.data.name);
-                    this.$router.push("/");
+                    this.$store.commit('login', {
+                        jwt: response.data.token,
+                        name: response.data.name
+                    });
+                    this.$router.push("/"); 
                 }
                 else {
                     this.error = response.data;

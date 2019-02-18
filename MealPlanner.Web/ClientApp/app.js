@@ -1,6 +1,6 @@
 import Vue from 'vue' 
 import axios from 'axios'
-import moment from 'moment'
+import moment, { locale } from 'moment'
 import router from './router'
 import store from './store'
 import { sync } from 'vuex-router-sync'
@@ -13,7 +13,22 @@ Vue.use(VueAppInsights, {
     router
 });
 
-axios.defaults.headers.authorization = 'Bearer ' + localStorage.getItem('jwtToken');
+axios.interceptors.request.use(function (request) { 
+    request.headers.authorization = 'Bearer ' + store.state.jwtToken;
+    return request;
+});
+
+axios.interceptors.response.use(function (response) {
+        return response;
+    },
+    function (error) {
+        if (error.response.status == 401) {
+            console.log('logout');
+            store.commit('logout');
+            router.push("/login");
+        }
+    });
+
 Vue.prototype.$http = axios;
 
 Vue.prototype.$moment = moment;
@@ -23,7 +38,7 @@ sync(store, router)
 const app = new Vue({
     store,
     router,
-    ...App
+    ...App 
 })
 
 export {
