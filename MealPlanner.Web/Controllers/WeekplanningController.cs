@@ -22,14 +22,14 @@ namespace MealPlanner.Web.Controllers
         [HttpGet("{year}/{week}")]
         public async Task<IActionResult> Current(int year, int week)
         {
-            var item = await this.weekplanning.GetForWeekAndYear(year, week, await this.GroupId());
+            var item = await this.weekplanning.GetForWeekAndYear(year, week,  this.GroupId().Value);
             return Ok(item);
         }
 
         [HttpPost("[action]")]
         public async Task<IActionResult> Save([FromBody]Weekplanning plan)
         {
-            var item = await this.weekplanning.Save(plan, await this.GroupId());
+            var item = await this.weekplanning.Save(plan, this.GroupId().Value);
             return Ok(item);
         }
 

@@ -20,14 +20,14 @@ namespace MealPlanner.Web.Controllers
         [HttpGet("[action]/{year}/{week}")]
         public async Task<ActionResult> Get(int year, int week)
         {
-            var items = await this.boughtIngredientRepository.GetForWeekAndYear(year, week, await this.GroupId());
+            var items = await this.boughtIngredientRepository.GetForWeekAndYear(year, week, this.GroupId().Value);
             return Ok(items);
         } 
 
         [HttpPost("[action]")]
         public async Task<ActionResult> Save([FromBody] BoughtIngredient item)
         { 
-            var existingItem = await this.boughtIngredientRepository.Save(item, await this.GroupId()); 
+            var existingItem = await this.boughtIngredientRepository.Save(item, this.GroupId().Value); 
             return Ok();
         } 
     } 

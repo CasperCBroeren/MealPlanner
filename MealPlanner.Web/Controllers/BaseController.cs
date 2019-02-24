@@ -1,19 +1,22 @@
-using MealPlanner.Data.Repositories;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
-using System.Threading.Tasks;
 
 namespace MealPlanner.Web.Controllers
 {
     public class BaseController : Controller
-    {     
-        public async Task<int> GroupId()
+    {
+        public int? GroupId()
         {
-            return int.Parse((this.User as ClaimsPrincipal).FindFirstValue("GroupId")); 
+            var result = 0;
+            if (int.TryParse((this.User as ClaimsPrincipal).FindFirstValue("GroupId"), out result))
+            {
+                return result;
+            }
+            return null;
         }
-         
-        public BaseController( )
-        { 
+
+        public BaseController()
+        {
         }
     }
 }

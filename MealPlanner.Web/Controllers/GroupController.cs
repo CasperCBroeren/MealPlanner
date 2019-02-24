@@ -66,6 +66,7 @@ namespace MealPlanner.Web.Controllers
                     new Claim("GroupId", group.GroupId.ToString())
                 }),
                 Expires = DateTime.UtcNow.AddDays(7),
+                Audience = "MealPlanner",
                 SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha512Signature)
             };
 
@@ -73,26 +74,30 @@ namespace MealPlanner.Web.Controllers
             return tokenHandler.WriteToken(token);
         }
 
-        [Route("getValidationToken"), HttpGet]
-        [Authorize(Policy = "GroupOnly")]
+        [Route("getValidationToken"), HttpGet] 
         public async Task<IActionResult> GetValidationToken()
         {
-            var group = (await this.groupRepository.GetById(await this.GroupId()));
-            var tfa = new TwoFactorAuth(group.Name);
-
-            return new JsonResult(new
+            var groupId = this.GroupId();
+            if (groupId.HasValue)
             {
-                name = group.Name,
-                qrCode = tfa.GetQrCodeImageAsDataUri(group.Name, group.Secret)
-            });
+                var group = (await this.groupRepository.GetById(groupId.Value));
+                var tfa = new TwoFactorAuth(group.Name);
 
+                return new JsonResult(new
+                {
+                    name = group.Name,
+                    qrCode = tfa.GetQrCodeImageAsDataUri(group.Name, group.Secret)
+                });
+            }
+
+            return new JsonResult("nope");
         }
 
         [Route("validate"), HttpPost]
         [Authorize(Policy = "GroupOnly")]
         public async Task<IActionResult> ValidateToken([FromBody]JObject payload)
         {
-            var group = (await this.groupRepository.GetById(await this.GroupId()));
+            var group = (await this.groupRepository.GetById(this.GroupId().Value));
             var tfa = new TwoFactorAuth(group.Name);
             if (tfa.VerifyCode(group.Secret, payload.Property("token").Value.ToString()))
             {

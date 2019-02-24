@@ -65,8 +65,11 @@ namespace mealplanner
                   {
                       ValidateIssuerSigningKey = true,
                       IssuerSigningKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(Configuration["jwtSecret"])),
-                      ValidateAudience = false,
-                      ValidateIssuer = false
+                      ValidateAudience = true,
+                      ValidAudience = "MealPlanner",
+                      ValidateIssuer = false,
+                      ValidateLifetime = true
+                      
                   };
               });
             services.AddAuthorization(options =>

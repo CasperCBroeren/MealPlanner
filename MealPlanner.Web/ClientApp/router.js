@@ -13,8 +13,7 @@ let router = new VueRouter({
 
 router.beforeEach((to, from, next) => {
     store.commit('initialiseStore');
-    var token = store.state.jwtToken;
-    console.log('Token: '+token)
+    var token = store.state.jwtToken; 
     // todo validate token on server
     if (token != null
         || to.matched.some(record => record.meta.public)) {

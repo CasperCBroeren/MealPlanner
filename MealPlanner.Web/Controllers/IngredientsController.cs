@@ -21,14 +21,14 @@ namespace MealPlanner.Web.Controllers
         [HttpGet("[action]")]
         public async Task<ActionResult> All()
         {
-            var items = await this.ingredientRepository.All(await this.GroupId());
+            var items = await this.ingredientRepository.All(this.GroupId().Value);
             return Ok(items); 
         }
 
         [HttpGet("[action]/{part}")]
         public async Task<ActionResult> Search([FromRoute]string part)
         {
-            var items = await this.ingredientRepository.SearchByPart(await this.GroupId(), part);
+            var items = await this.ingredientRepository.SearchByPart(this.GroupId().Value, part);
             if (items != null)
             {
                 return Ok(items);
@@ -42,7 +42,7 @@ namespace MealPlanner.Web.Controllers
         [HttpGet("[action]/{name}")]
         public async Task<ActionResult> Find([FromRoute]string name)
         {
-            var item = await this.ingredientRepository.FindSingleByName(await this.GroupId(), name);
+            var item = await this.ingredientRepository.FindSingleByName(this.GroupId().Value, name);
             if (item !=null ) 
             {
                 return Ok(item);
@@ -58,7 +58,7 @@ namespace MealPlanner.Web.Controllers
         {
             if (!string.IsNullOrWhiteSpace(item.Name))
             {  
-                var result = await this.ingredientRepository.Save(await this.GroupId(),item);
+                var result = await this.ingredientRepository.Save(this.GroupId().Value,item);
                 return Ok( new {
                                 id = item.Id, 
                                 item = item
@@ -71,7 +71,7 @@ namespace MealPlanner.Web.Controllers
         [HttpPost("[action]")]
         public async Task<ActionResult> Delete([FromBody] Ingredient item)
         {
-            var result = await this.ingredientRepository.Delete(await this.GroupId(),item);
+            var result = await this.ingredientRepository.Delete(this.GroupId().Value,item);
             return Ok(result ? "done": "nochange");
         }
     }

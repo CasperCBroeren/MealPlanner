@@ -21,14 +21,14 @@ namespace MealPlanner.Web.Controllers
         [HttpGet("[action]")]
         public async Task<ActionResult> All()
         {
-            var items = await this.mealRepository.All(await this.GroupId());
+            var items = await this.mealRepository.All(this.GroupId().Value);
             return Ok(items); 
         }
 
         [HttpGet("[action]/{id}")]
         public async Task<ActionResult> Get(int id)
         {
-            var items = await this.mealRepository.FindOneById(id, await this.GroupId());
+            var items = await this.mealRepository.FindOneById(id, this.GroupId().Value);
             return Ok(items);
         }
 
@@ -36,7 +36,7 @@ namespace MealPlanner.Web.Controllers
         [HttpPost("[action]")]
         public async  Task<ActionResult> FindByIngredients([FromBody] Ingredient[] ingredients)
         {
-            var item = await this.mealRepository.FindByIngredients(ingredients, await this.GroupId());
+            var item = await this.mealRepository.FindByIngredients(ingredients, this.GroupId().Value);
             if (item != null)
             {
                 return Ok(item);
@@ -51,7 +51,7 @@ namespace MealPlanner.Web.Controllers
         public async Task<ActionResult> FindByTagsandType([FromBody] SearchByTagsAndType options)
         {
 
-            var item = await this.mealRepository.FindByTagAndType(options.Tags, options.Type, await this.GroupId());
+            var item = await this.mealRepository.FindByTagAndType(options.Tags, options.Type,  this.GroupId().Value);
             if (item != null)
             {
                 return Ok(item);
@@ -65,7 +65,7 @@ namespace MealPlanner.Web.Controllers
         [HttpGet("[action]/{term}")]
         public async Task<ActionResult> Find([FromRoute]string term)
         {
-            var item = await this.mealRepository.FindAllByTerm(term, await this.GroupId());
+            var item = await this.mealRepository.FindAllByTerm(term, this.GroupId().Value);
             if (item != null)
             {
                 return Ok(item);
@@ -84,7 +84,7 @@ namespace MealPlanner.Web.Controllers
                 var isDuplicate = false;
                 if (!item.Created.HasValue)
                 { 
-                    var existingItem = await this.mealRepository.FindOneByName(item.Name, await this.GroupId());
+                    var existingItem = await this.mealRepository.FindOneByName(item.Name, this.GroupId().Value);
                     if (existingItem == null)
                     {
                         item.Created = DateTime.Now;
@@ -96,7 +96,7 @@ namespace MealPlanner.Web.Controllers
                     }
                 }
 
-                var result = await this.mealRepository.Save(item, await this.GroupId());
+                var result = await this.mealRepository.Save(item, this.GroupId().Value);
                 return Ok( new {
                                 created = item.Created,
                                 isDuplicate
@@ -109,7 +109,7 @@ namespace MealPlanner.Web.Controllers
         [HttpPost("[action]")]
         public async Task<ActionResult> Delete([FromBody] Meal item)
         {
-            var result = await this.mealRepository.Delete(item, await this.GroupId());
+            var result = await this.mealRepository.Delete(item, this.GroupId().Value);
             return Ok(result ? "done": "nochange");
         }
     }
