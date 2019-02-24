@@ -12,11 +12,7 @@ import NewGroup from './components/newgroup.vue';
 export const routes = [
     { path: '/', component: HomePage, display: 'Dashboard', style: 'fa fa-home', hideInMenu: true, meta: { public: false, hideMenu: false } },
     {
-        path: '/weekplanning', component: WeekPlanning, display: 'Weekplan', style: 'fa fa-list-ul', meta: { public: false, hideMenu: false }, props:
-            (route) => ({
-                year: route.params.year == null ? new Date().getFullYear() : parseInt(route.params.year),
-                week: route.params.week == null ? new Date().getWeek() : parseInt(route.params.week)
-            }),
+        path: '/weekplanning', component: WeekPlanning, display: 'Weekplan', style: 'fa fa-list-ul', meta: { public: false, hideMenu: false },
         children: [
             {
                 path: ':year/:week', component: WeekPlanning

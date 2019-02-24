@@ -6,10 +6,10 @@
                 <p>Plan een week met maaltijden en krijg een handige uitdraai van alle ingredienten</p>
                 <nav aria-label="Week">
                     <ul class="pagination justify-content-center">
-                        <li class="page-item"><a class="page-link" :href="'/weekplanning/' + prevYear + '/' + prevWeek">&lt;&lt;</a></li>
+                        <li class="page-item"><a class="page-link" v-on:click="prevClick">&lt;&lt;</a></li>
                         <li class="page-item-lg disabled larger d-none d-sm-block"><a class="page-link pl-5 pr-5" href="#"> Week <b>{{week}}</b> van <b>{{year}}</b></a></li>
                         <li class="page-item-lg disabled d-block d-sm-none"><a class="page-link pl-5 pr-5" href="#"> Week <b>{{week}}</b></a></li>
-                        <li class="page-item "><a class="page-link" :href="'/weekplanning/' + nextYear + '/' + nextWeek">&gt;&gt;</a></li>
+                        <li class="page-item "><a class="page-link" v-on:click="nextClick">&gt;&gt;</a></li>
                     </ul>
                 </nav>
             </div>
@@ -139,10 +139,7 @@
     import moment from 'moment'
 
     export default {
-        props: [
-            'week',
-            'year'
-        ],
+
         filters: {
             formatDate: function (value) {
                 if (value) {
@@ -152,6 +149,17 @@
         },
         data() {
             return {
+                defaultMeals: [
+                    { dayName: 'maandag', meal: null },
+                    { dayName: 'dinsdag', meal: null },
+                    { dayName: 'woensdag', meal: null },
+                    { dayName: 'donderdag', meal: null },
+                    { dayName: 'vrijdag', meal: null },
+                    { dayName: 'zaterdag', meal: null },
+                    { dayName: 'zondag', meal: null },
+                ],
+                week: null,
+                year: null,
                 questionType: 0,
                 searchForMeal: null,
                 searchForIngredients: [],
@@ -163,15 +171,7 @@
                 ingredientOptions: [],
                 step: 1,
                 weekPlanningId: null,
-                meals: [
-                    { dayName: 'maandag', meal: null },
-                    { dayName: 'dinsdag', meal: null },
-                    { dayName: 'woensdag', meal: null },
-                    { dayName: 'donderdag', meal: null },
-                    { dayName: 'vrijdag', meal: null },
-                    { dayName: 'zaterdag', meal: null },
-                    { dayName: 'zondag', meal: null },
-                ],
+                meals: null,
                 tagSearchFor: null,
                 tagOptions: [],
                 tags: []
@@ -208,6 +208,22 @@
             }
         },
         methods: {
+            prevClick : async function()
+            {
+                var newUrl = '/weekplanning/' + this.prevYear + '/' + this.prevWeek;
+                this.year = this.prevYear;
+                this.week = this.prevWeek;
+                this.$router.push(newUrl);
+                await this.loadWeek();
+            },
+            nextClick : async function()
+            {
+                var newUrl = '/weekplanning/' + this.nextYear + '/' + this.nextWeek;
+                this.year = this.nextYear;
+                this.week = this.nextWeek;
+                this.$router.push(newUrl);
+                await this.loadWeek();
+            },
             lookupIngredients: async function (val) {
                 if (val.length > 0) {
                     let response = await this.$http.get('/api/Ingredients/search/' + encodeURI(val));
@@ -360,34 +376,42 @@
 
                     }
                 }
-            }
+            },
+            loadWeek: async function() {
+                 try {
+                    let response = await this.$http.get('/api/Weekplanning/' + this.year + '/' + this.week);
 
-        },
-
-        async created() {
-            try {
-                let response = await this.$http.get('/api/Weekplanning/' + this.year + '/' + this.week);
-
-                if (response.data) {
-                    if (response.data.days != null) {
-                        this.meals = response.data.days;
+                    if (response.data) {
+                        if (response.data.days != null) {
+                            this.meals = response.data.days;
+                        }
+                        else
+                        {
+                            this.meals = this.defaultMeals;
+                        }
+                        this.weekPlanningId = response.data.id;
                     }
-                    this.weekPlanningId = response.data.id;
+                    else
+                    {
+                        this.meals = this.defaultMeals;
+                    }
+                }
+                catch (error) {
+                    console.log(error);
                 }
             }
-            catch (error) {
-
-                if (error.response != null && error.response.status == 404) {
-
-                }
-            }
-
+        },
+        async created() {
+            this.year = new Date().getFullYear();
+            this.week = new Date().getWeek();
+            await this.loadWeek();
         }
     }
 </script>
 <style>
     .page-link {
         color: #6c757d;
+        cursor: pointer;
     }
 
     .modal-dialog {

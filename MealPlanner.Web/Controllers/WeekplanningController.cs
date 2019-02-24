@@ -1,6 +1,5 @@
 using MealPlanner.Data.Models;
-using MealPlanner.Data.Repositories;
-using MealPlanner.Data.Security;
+using MealPlanner.Data.Repositories; 
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks;
