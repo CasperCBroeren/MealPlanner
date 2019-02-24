@@ -210,24 +210,30 @@
 
             },
             addIngredient: async function (value) {
-                try {
-                    let response = await this.$http.get('/api/Ingredients/Find/' + value);
+                if (value) {
+                    try {
+                        let response = await this.$http.get('/api/Ingredients/Find/' + value);
 
-                    if (response.data && this.filterValue(this.editItem.ingredients, "id", response.data.uid) == null) {
-                        response.data.amount = 1;
-                        this.editItem.ingredients.push(response.data);
+                        if (response.data && this.filterValue(this.editItem.ingredients, "id", response.data.uid) == null) {
+                            response.data.amount = 1;
+                            this.editItem.ingredients.push(response.data);
+                        }
+                        else {
+                            this.ingredientToAdd = {
+                                name: value,
+                                amount: 1
+                            }
+                        }
                     }
-                }
-                catch (error) {
-
-                    if (error.response != null && error.response.status == 404) {
-                        this.ingredientToAdd = {
-                            name: value,
-                            amount: 1
+                    catch (error) {
+                        if (error.response != null && error.response.status == 404) {
+                            this.ingredientToAdd = {
+                                name: value,
+                                amount: 1
+                            }
                         }
                     }
                 }
-
             },
             renderIngredients: function (items) {
                 if (!items || items.length == 0) return "";
