@@ -32,7 +32,7 @@ namespace mealplanner
                             keyVaultEndpoint, keyVaultClient, new DefaultKeyVaultSecretManager());
                     }
                 }
-            })
+            }) 
             .UseStartup<Startup>();
         }
 

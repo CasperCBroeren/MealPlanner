@@ -45,10 +45,12 @@
         "popper.js": "1.14.4",
         "sass-loader": "^4.1.0",
         "style-loader": "^0.13.1",
+        "sw-precache-webpack-plugin": "^0.11.5",
         "url-loader": "^1.1.2",
         "vue-loader": "^10.0.2",
         "vue-moment": "^4.0.0-0",
         "webpack": "^2.2.0",
-        "webpack-hot-middleware": "^2.12.2"
+        "webpack-hot-middleware": "^2.12.2",
+        "webpack-pwa-manifest": "^4.0.0"
     }
 }

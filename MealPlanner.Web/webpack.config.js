@@ -1,7 +1,11 @@
 const path = require('path');
 const webpack = require('webpack');
 const ExtractTextPlugin = require('extract-text-webpack-plugin');
-const bundleOutputDir = './wwwroot/dist';
+const SWPrecacheWebpackPlugin = require('sw-precache-webpack-plugin');
+const WebpackPwaManifest = require('webpack-pwa-manifest');
+
+
+const bundleOutputDir = './wwwroot/dist'; 
 
 module.exports = (env) => {
     const isDevBuild = !(env && env.prod);
@@ -44,6 +48,35 @@ module.exports = (env) => {
             ]
         },
         plugins: [
+            new SWPrecacheWebpackPlugin(
+                {
+                    cacheId: 'mealplanner',
+                    dontCacheBustUrlsMatching: /\.\w{8}\./,
+                    filename: '../service-worker.js',
+                    minify: false,
+                    dynamicUrlToDependencies: {
+                        '/': ['./wwwroot/plain.html']
+                    },
+                    navigateFallback: '/',
+                    staticFileGlobsIgnorePatterns: [/\.map$/, /manifest\.json$/]
+                }
+            ),
+            new WebpackPwaManifest({
+                filename: "manifest.json",
+                name: 'Maaltijdplanner',
+                short_name: 'MP',
+                description: 'Plan je maaltijd voor een week met gemak!',
+                background_color: '#E5E5E5',
+                theme_color: '#88B337', 
+                start_url: './login',
+                icons: [
+                    {
+                        src: path.resolve('./wwwroot/icon.png'),
+                        sizes: [96, 128, 192, 256, 384, 512],
+                        destination: path.join('assets', 'icons')
+                    }
+                ]
+            }),
             new webpack.DllReferencePlugin({
                 context: __dirname,
                 manifest: require('./wwwroot/dist/vendor-manifest.json')

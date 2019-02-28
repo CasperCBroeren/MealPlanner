@@ -6,8 +6,15 @@
     <title>Maaltijd planner</title>
     <link rel="shortcut icon" href="/favicon.png" type="image/png" />
     <link rel="stylesheet" href="~/dist/vendor.css" asp-append-version="true" />
+    <link rel="manifest" href="~/dist/manifest.json">
+
+    <meta name="theme-color" content="#88B337">
 </head> 
 <body>
+    <noscript>
+        <h1>Bummer.. geen javascript.. geen applicatie</h1>
+        <p>Javascript is al sinds jaar en dag een onderdeel van veilige en productieve apps. Gebruik het!</p>
+    </noscript>
     @RenderBody()
 
     <script src="~/dist/vendor.js" asp-append-version="true"></script>

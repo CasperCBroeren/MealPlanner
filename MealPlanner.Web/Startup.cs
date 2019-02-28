@@ -5,12 +5,14 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.ResponseCompression;
 using Microsoft.AspNetCore.SpaServices.Webpack;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
+using System.Linq;
 using System.Text;
 using Umi.Core;
 
@@ -23,7 +25,7 @@ namespace mealplanner
             var builder = new ConfigurationBuilder()
                 .SetBasePath(env.ContentRootPath)
                 .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
-                .AddJsonFile($"appsettings.{env.EnvironmentName}.json", optional: true) 
+                .AddJsonFile($"appsettings.{env.EnvironmentName}.json", optional: true)
                 .AddEnvironmentVariables();
 
             if (!env.IsDevelopment())
@@ -52,11 +54,11 @@ namespace mealplanner
             services.AddMvc();
 
             services.AddAuthentication(options =>
-           {
-               options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-               options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+               {
+                   options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                   options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
 
-           })
+               })
                .AddJwtBearer(options =>
               {
                   options.RequireHttpsMetadata = false;
@@ -69,7 +71,7 @@ namespace mealplanner
                       ValidAudience = "MealPlanner",
                       ValidateIssuer = false,
                       ValidateLifetime = true
-                      
+
                   };
               });
             services.AddAuthorization(options =>
@@ -79,6 +81,17 @@ namespace mealplanner
                     policy.RequireClaim("GroupId");
                     policy.AuthenticationSchemes.Add(JwtBearerDefaults.AuthenticationScheme);
                 });
+            });
+
+            services.AddResponseCompression(options =>
+            { 
+                options.Providers.Add<GzipCompressionProvider>(); 
+                options.MimeTypes =
+                    ResponseCompressionDefaults.MimeTypes.Concat(
+                        new[] { "image/svg+xml",
+                                "image/png",
+                                "text/css",
+                                "application/javascript"});
             });
 
         }
@@ -113,6 +126,7 @@ namespace mealplanner
                 csp.AllowStyles.From("'unsafe-inline'").FromSelf();
             });
 
+            app.UseResponseCompression();
 
             app.UseStaticFiles();
 

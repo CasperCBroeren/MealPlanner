@@ -2,7 +2,7 @@
     <div class="container">
         <div class="row">
             <div class="col-sm-4 pt-3 pr-5 ">
-                <img src="images/icon_512.png" class="img-fluid"/>
+                <img src="icon.png" class="img-fluid"/>
             </div>
             <div class="col-sm-8 align-middle">
 
