@@ -1,5 +1,6 @@
 import Vue from 'vue' 
 import axios from 'axios'
+import wrapper from 'axios-cache-plugin'
 import moment, { locale } from 'moment'
 import router from './router'
 import store from './store'
@@ -29,7 +30,15 @@ axios.interceptors.response.use(function (response) {
         return error;
     });
 
-Vue.prototype.$http = axios;
+Vue.prototype.$http = wrapper(axios, {
+    maxCacheSize: 15,
+    ttl: 1000 * 60 * 60 * 24 * 10
+});
+Vue.prototype.$http.__addFilter(/Ingredients/);
+Vue.prototype.$http.__addFilter(/Meal/);
+Vue.prototype.$http.__addFilter(/ShoppingList/);
+Vue.prototype.$http.__addFilter(/Weekplanning/);
+
 
 Vue.prototype.$moment = moment;
 
@@ -53,4 +62,16 @@ export {
     app,
     router,
     store
+}
+
+
+// IOS install popup 
+const isIos = () => {
+    const userAgent = window.navigator.userAgent.toLowerCase();
+    return /iphone|ipad|ipod/.test(userAgent);
+}
+ const isInStandaloneMode = () => ('standalone' in window.navigator) && (window.navigator.standalone);
+ 
+if (isIos() && !isInStandaloneMode()) {
+    this.setState({ showInstallMessage: true });
 }

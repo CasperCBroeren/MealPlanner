@@ -84,14 +84,16 @@ namespace mealplanner
             });
 
             services.AddResponseCompression(options =>
-            { 
+            {
+                options.EnableForHttps = true;
                 options.Providers.Add<GzipCompressionProvider>(); 
                 options.MimeTypes =
                     ResponseCompressionDefaults.MimeTypes.Concat(
                         new[] { "image/svg+xml",
                                 "image/png",
                                 "text/css",
-                                "application/javascript"});
+                                "application/javascript",
+                                "application/json"});
             });
 
         }

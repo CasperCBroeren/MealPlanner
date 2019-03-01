@@ -50,12 +50,12 @@ module.exports = (env) => {
         plugins: [
             new SWPrecacheWebpackPlugin(
                 {
-                    cacheId: 'mealplanner',
+                    cacheId: 'mealplanner.v02',
                     dontCacheBustUrlsMatching: /\.\w{8}\./,
                     filename: '../service-worker.js',
                     minify: false,
                     dynamicUrlToDependencies: {
-                        '/': ['./wwwroot/plain.html']
+                        '/': ['./views/shared/_Layout.cshtml']
                     },
                     navigateFallback: '/',
                     staticFileGlobsIgnorePatterns: [/\.map$/, /manifest\.json$/]
@@ -63,12 +63,13 @@ module.exports = (env) => {
             ),
             new WebpackPwaManifest({
                 filename: "manifest.json",
-                name: 'Maaltijdplanner',
-                short_name: 'MP',
+                name: 'Maaltijd planner',
+                short_name: 'Maaltijd planner',
                 description: 'Plan je maaltijd voor een week met gemak!',
                 background_color: '#E5E5E5',
                 theme_color: '#88B337', 
                 start_url: './login',
+                display: 'fullscreen',
                 icons: [
                     {
                         src: path.resolve('./wwwroot/icon.png'),

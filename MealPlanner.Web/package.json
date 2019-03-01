@@ -12,6 +12,7 @@
         "@fortawesome/vue-fontawesome": "^0.1.2",
         "applicationinsights": "^1.0.6",
         "axios": "^0.15.3",
+        "axios-cache-plugin": "^0.1.0",
         "core-js": "^2.4.1",
         "font-awesome": "^4.6.3",
         "moment": "^2.22.1",

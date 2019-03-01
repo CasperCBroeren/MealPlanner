@@ -106,3 +106,8 @@ a {
     background: #DEDEDE;
     box-shadow: none;
 }
+
+body {
+    -webkit-user-select: none;
+    -webkit-touch-callout: none;
+}

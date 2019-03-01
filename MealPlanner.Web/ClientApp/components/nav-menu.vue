@@ -1,7 +1,7 @@
 <template>
     <nav class="navbar navbar-expand-lg navbar-light bg-light mb-3">
         <img src="/favicon.png" class="img-fluid mr-3" />
-        <a class="navbar-brand" href="/"><b>Maaltijd</b>Plan</a>
+        <a class="navbar-brand" href="/"><b>Maaltijd</b> Plan</a>
         <i  v-if="this.showMenu()"> 
              {{this.getGroupName()}}</i>
         <ul class="navbar-nav mr-auto" v-if="this.showMenu()">
