@@ -30,9 +30,6 @@ namespace MealPlanner.Web.Controllers
         {
             var item = await this.weekplanning.Save(plan, this.GroupId().Value);
             return Ok(item);
-        }
-
-
-
+        } 
     }
 }

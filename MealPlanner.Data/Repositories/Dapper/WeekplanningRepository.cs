@@ -38,13 +38,14 @@ namespace MealPlanner.Data.Repositories.Dapper
                             Week = x.week,
                             Year = x.year,
                             Days = new List<Day>() {
-                            new Day("zondag", x.Sunday),
+                            
                             new Day("maandag", x.Monday),
                             new Day("dinsdag", x.Tuesday),
                             new Day("woensdag", x.Wednesday),
                             new Day("donderdag", x.Thursday),
                             new Day("vrijdag", x.Friday),
-                            new Day("zaterdag", x.Saturday) }
+                            new Day("zaterdag", x.Saturday),
+                            new Day("zondag", x.Sunday),}
                         };
                         return wk;
                     }).FirstOrDefault();
