@@ -254,7 +254,7 @@ namespace MealPlanner.Data.Repositories.Dapper
             var query = $@"SELECT distinct m.Id Id, m.Name Name, m.Description Description, m.Created created, m.Mealtype mealType, 
                                  i.Id id, i.Name Name, im.Amount Amount
                             FROM [dbo].[Meals] m 
-                                inner join (select MealId as Id  from TagsOfMeals where TagId in @tags) selection on selection.Id =m.Id
+                                left join (select MealId as Id  from TagsOfMeals where TagId in @tags) selection on selection.Id =m.Id
 	                            left join [dbo].[IngredientsInMeals] im on im.MealId = m.Id
 	                            left join [dbo].[Ingredients] i on im.IngredientId = i.Id
                                 where isNull(@selectedType, MealType)=MealType and m.groupId = @groupId ";

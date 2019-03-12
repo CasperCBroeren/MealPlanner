@@ -84,13 +84,13 @@ namespace MealPlanner.Data.Repositories.Dapper
                 {
                     year = item.Year,
                     week = item.Week,
-                    meal1 = item.Days[0].Meal?.Id,
-                    meal2 = item.Days[1].Meal?.Id,
-                    meal3 = item.Days[2].Meal?.Id,
-                    meal4 = item.Days[3].Meal?.Id,
-                    meal5 = item.Days[4].Meal?.Id,
-                    meal6 = item.Days[5].Meal?.Id,
-                    meal7 = item.Days[6].Meal?.Id,
+                    meal1 = item.Days[6].Meal?.Id,
+                    meal2 = item.Days[0].Meal?.Id,
+                    meal3 = item.Days[1].Meal?.Id,
+                    meal4 = item.Days[2].Meal?.Id,
+                    meal5 = item.Days[3].Meal?.Id,
+                    meal6 = item.Days[4].Meal?.Id,
+                    meal7 = item.Days[5].Meal?.Id,
                     groupId
                 });
             }

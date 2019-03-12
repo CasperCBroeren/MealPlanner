@@ -61,7 +61,7 @@
                     </div>
                     <div class="modal-body" v-if=" questionType==1">
                         <div class="form-group input-group">
-                            <input type="text" class="form-control" v-model="searchForMeal" id="searchForMeal"
+                            <input type="text" class="form-control" v-model="searchForMeal" id="searchForMeal" autocomplete="off"
                                    placeholder="Naam van maaltijd" v-on:keydown.enter="searchMeal()">
                             <div class="input-group-append">
                                 <button class="btn btn-outline-secondary far fa-plus-square" type="button" v-on:click="searchMeal()"></button>
@@ -368,6 +368,7 @@
 
                     if (response.data) {
                         this.mealResults = response.data;
+
                     }
                 }
                 catch (error) {
@@ -382,19 +383,16 @@
                     let response = await this.$http.get('/api/Weekplanning/' + this.year + '/' + this.week);
 
                     if (response.data) {
-                        if (response.data.days != null) {
+                        if (response.data.days) {
                             this.meals = response.data.days;
+                            this.weekPlanningId = response.data.id;
+                            return;
                         }
-                        else
-                        {
-                            this.meals = this.defaultMeals;
-                        }
-                        this.weekPlanningId = response.data.id;
+
                     }
-                    else
-                    {
-                        this.meals = this.defaultMeals;
-                    }
+
+                    this.meals = this.defaultMeals;
+                    this.weekPlanningId = null;
                 }
                 catch (error) {
                     console.log(error);
@@ -402,8 +400,10 @@
             }
         },
         async created() {
-            this.year = new Date().getFullYear();
-            this.week = new Date().getWeek();
+            var route  = this.$router.currentRoute;
+
+            this.year = route.params.year == null ? new Date().getFullYear() : parseInt(route.params.year);
+            this.week = route.params.week == null ? new Date().getWeek() : parseInt(route.params.week);
             await this.loadWeek();
         }
     }
