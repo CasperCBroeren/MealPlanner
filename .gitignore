@@ -13,3 +13,4 @@
 /obj
 /MealPlanner.Data/bin/Release/netcoreapp2.1
 /MealPlanner.Data/bin/Release/netcoreapp2.2
+/MealPlanner.EndToEndTests/node_modules

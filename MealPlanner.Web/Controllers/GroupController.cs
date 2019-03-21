@@ -57,6 +57,13 @@ namespace MealPlanner.Web.Controllers
             return Ok("Er is geen naam ontvangen");
         }
 
+        [Route("logout")]
+        public IActionResult Logout()
+        {
+
+            return Ok();
+        }
+
         private string JoinGroupJwtBased(Group group)
         {
             var tokenHandler = new JwtSecurityTokenHandler();
