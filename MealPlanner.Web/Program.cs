@@ -4,6 +4,8 @@ using Microsoft.Azure.KeyVault;
 using Microsoft.Azure.Services.AppAuthentication;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Configuration.AzureKeyVault;
+using Microsoft.Extensions.Logging;
+
 
 namespace mealplanner
 {
@@ -16,24 +18,32 @@ namespace mealplanner
 
         public static IWebHostBuilder BuildWebHost(string[] args)
         {
-            return WebHost.CreateDefaultBuilder(args).ConfigureAppConfiguration((context, config) =>
-            {
-                if (!context.HostingEnvironment.IsDevelopment())
+            return WebHost.CreateDefaultBuilder(args)
+                .ConfigureAppConfiguration((context, config) =>
                 {
-                    var builtConfig = config.Build();
-                    var keyVaultEndpoint = GetKeyVaultEndpoint();
-                    if (!string.IsNullOrEmpty(keyVaultEndpoint))
+                    if (!context.HostingEnvironment.IsDevelopment())
                     {
-                        var azureServiceTokenProvider = new AzureServiceTokenProvider();
-                        var keyVaultClient = new KeyVaultClient(
-                            new KeyVaultClient.AuthenticationCallback(
-                                azureServiceTokenProvider.KeyVaultTokenCallback));
-                        config.AddAzureKeyVault(
-                            keyVaultEndpoint, keyVaultClient, new DefaultKeyVaultSecretManager());
+                        var builtConfig = config.Build();
+                        var keyVaultEndpoint = GetKeyVaultEndpoint();
+                        if (!string.IsNullOrEmpty(keyVaultEndpoint))
+                        {
+                            var azureServiceTokenProvider = new AzureServiceTokenProvider();
+                            var keyVaultClient = new KeyVaultClient(
+                                new KeyVaultClient.AuthenticationCallback(
+                                    azureServiceTokenProvider.KeyVaultTokenCallback));
+                            config.AddAzureKeyVault(
+                                keyVaultEndpoint, keyVaultClient, new DefaultKeyVaultSecretManager());
+                        }
                     }
-                }
-            }) 
-            .UseStartup<Startup>();
+                })
+                 .ConfigureLogging((hostingContext, logging) =>
+                 {
+                     logging.AddConfiguration(hostingContext.Configuration.GetSection("Logging"));
+                     logging.AddConsole();
+                     logging.AddDebug();
+                     logging.AddEventSourceLogger();
+                 })
+                .UseStartup<Startup>();
         }
 
         private static string GetKeyVaultEndpoint() => "https://maaltijdplanner.vault.azure.net";
