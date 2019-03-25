@@ -5,7 +5,9 @@
                 <img src="icon.png" class="img-fluid"/>
             </div>
             <div class="col-sm-8 align-middle">
-
+                <div class="alert alert-success" v-if="isLoggedOut">
+                    Je bent uitgelogd
+                </div>
                 <h1>Welkom</h1>
                 <p>
                     Voer een groepsnaam  en je one-time-password van uit je app in. Ben je nieuw dan maak je eigen groep aan <a href="/new">hier</a>.
@@ -50,7 +52,8 @@ export default {
         return {
             error: null,
             name: null,
-            token: null
+            token: null,
+            isLoggedOut: false
         }
     },
 
@@ -65,7 +68,8 @@ export default {
                 if (response.data.token) {
                     this.$store.commit('login', {
                         jwt: response.data.token,
-                        name: response.data.name
+                        name: response.data.name,
+                        refreshToken: response.data.refreshToken
                     });
                     this.$router.push("/"); 
                 }
@@ -78,15 +82,19 @@ export default {
         }
     },
 
-    async created() {
+        async created() { 
+            if (this.$router.currentRoute.path == "/logout") {
+                this.$store.commit('logout');
+                this.isLoggedOut = true;
+            }
 
-        try {
-            let response = await this.$http.get('/api/Login/State')
+            try {
+                let response = await this.$http.get('/api/Login/State')
 
-            this.ingredients = response.data;
-        } catch (error) {
-            console.log(error)
-        }
+                this.ingredients = response.data;
+            } catch (error) {
+                console.log(error)
+            }
 
     }
 }

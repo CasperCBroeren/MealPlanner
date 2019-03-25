@@ -12,24 +12,30 @@ export default new Vuex.Store({
         login(state, payload) { 
             state.jwtToken = payload.jwt;
             state.groupName = payload.name;
+            state.refreshToken = payload.refreshToken;
             localStorage.setItem('jwtToken', payload.jwt);
             localStorage.setItem('groupName', payload.name);
+            localStorage.setItem('refreshToken', payload.refreshToken);
         },
         logout(state) {
             state.jwtToken = null;
             state.groupName = null;
+            state.refreshToken = null;
 
             localStorage.removeItem('jwtToken');
             localStorage.removeItem('groupName');
+            localStorage.removeItem('refreshToken');
         },
         initialiseStore(state) {
              
             if (!state.jwtToken &&
                 localStorage.getItem('jwtToken') &&
-                localStorage.getItem('groupName')) {
+                localStorage.getItem('groupName') &&
+                localStorage.getItem('refreshToken')) {
                 
                 state.jwtToken = localStorage.getItem('jwtToken');
-                state.groupName = localStorage.getItem('groupName'); 
+                state.groupName = localStorage.getItem('groupName');
+                state.refreshToken = localStorage.getItem('refreshToken'); 
             }
         }
     }

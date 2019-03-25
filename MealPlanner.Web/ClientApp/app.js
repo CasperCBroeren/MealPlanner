@@ -1,4 +1,4 @@
-import Vue from 'vue' 
+import Vue from 'vue'
 import axios from 'axios'
 import wrapper from 'axios-cache-plugin'
 import moment, { locale } from 'moment'
@@ -7,26 +7,52 @@ import store from './store'
 import { sync } from 'vuex-router-sync'
 import App from 'components/app-root'
 import VueAppInsights from 'vue-application-insights'
- 
- 
+
+
 Vue.use(VueAppInsights, {
     id: '2b8c5f23-23fa-4234-90f6-11de0acd37b4',
     router
 });
 
-axios.interceptors.request.use(function (request) { 
+axios.interceptors.request.use(function (request) {
     request.headers.authorization = 'Bearer ' + store.state.jwtToken;
     return request;
 });
 
 axios.interceptors.response.use(function (response) {
-        return response;
-    },
-    function (error) {
-        if (error.response.status === 401) { 
+    return response;
+},
+    async function (error) {
+        if (error.response.status === 401) {
+            console.log(error.response.headers)
+            if (error.response.headers.tokenexpired
+                && store.state.refreshToken) {
+                console.log(store.state.refreshToken);
+                try {
+                    let response = await axios.post('/api/group/refresh/',
+                        {
+                            refreshToken: store.state.refreshToken,
+                            token: store.state.jwtToken
+                        });
+                    
+                    if (response.data.token) {
+                        store.commit('login', {
+                            jwt: response.data.token,
+                            name: response.data.name,
+                            refreshToken: response.data.refreshToken
+                        });
+                        // retry initial call
+                        return axios.request(error.config);
+                    }
+
+                } catch (error) {
+                    console.log(error);
+                }
+            }
+
             store.commit('logout');
-            router.push("/login");
-        } 
+            router.push("/login"); 
+        }
         return error;
     });
 
@@ -70,8 +96,8 @@ const isIos = () => {
     const userAgent = window.navigator.userAgent.toLowerCase();
     return /iphone|ipad|ipod/.test(userAgent);
 }
- const isInStandaloneMode = () => ('standalone' in window.navigator) && (window.navigator.standalone);
- 
+const isInStandaloneMode = () => ('standalone' in window.navigator) && (window.navigator.standalone);
+
 if (isIos() && !isInStandaloneMode()) {
     this.setState({ showInstallMessage: true });
 }

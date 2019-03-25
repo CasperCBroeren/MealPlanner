@@ -27,6 +27,12 @@
 
             </div>
         </div>
+        <div class="row mt-4">
+            <div class="col-sm-12">
+                <h3>Uitloggen</h3>
+                Klik <a  href="/logout">hier</a> om uit te loggen
+            </div>
+        </div>
     </div>
 </template>
 
@@ -55,7 +61,7 @@
         },
 
         async created() {
-
+             
             try {
                 let response = await this.$http.get('/api/Options')
                 this.token = response.data.token;

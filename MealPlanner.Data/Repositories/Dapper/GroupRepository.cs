@@ -23,9 +23,9 @@ namespace MealPlanner.Data.Repositories.Dapper
                 await connection.OpenAsync();
                 if (!item.GroupId.HasValue)
                 {
-                    var queryInsert = @"insert into Groups(name, secret) values ( @name, @secret);
+                    var queryInsert = @"insert into Groups(name, secret, refreshtoken) values ( @name, @secret, @refreshToken);
                                         select SCOPE_IDENTITY();";
-                    var result = await connection.QueryAsync<int>(queryInsert, new { name = item.Name, secret = item.Secret });
+                    var result = await connection.QueryAsync<int>(queryInsert, new { name = item.Name, secret = item.Secret, refreshToken =item.RefreshToken });
                     if (result.Any())
                     {
                         item.GroupId = result.First();
@@ -35,11 +35,12 @@ namespace MealPlanner.Data.Repositories.Dapper
                 }
                 else
                 {
-                    var queryUpdate = $"update groups set name=@name, secret=@secret where  groupId=@id";
+                    var queryUpdate = $"update groups set name=@name, secret=@secret, refreshToken=@refreshToken where  groupId=@id";
 
                     var updateCommand = new SqlCommand(queryUpdate, connection);
                     updateCommand.Parameters.Add(new SqlParameter("name", item.Name));
                     updateCommand.Parameters.Add(new SqlParameter("secret", item.Secret));
+                    updateCommand.Parameters.Add(new SqlParameter("refreshToken", item.RefreshToken));
                     updateCommand.Parameters.Add(new SqlParameter("id", item.GroupId)); 
                     return await updateCommand.ExecuteNonQueryAsync() == 1;
                 }
@@ -51,7 +52,7 @@ namespace MealPlanner.Data.Repositories.Dapper
             using (var connection = new SqlConnection(this.connectionString))
             {
                 await connection.OpenAsync();
-                var query = @"select GroupId, Name, Secret, Created from Groups where name = @name";
+                var query = @"select GroupId, Name, Secret, Created, RefreshToken from Groups where name = @name";
                 var result = await connection.QueryAsync<Group>(query, new { name });
                 return result.FirstOrDefault();
             }
@@ -62,7 +63,7 @@ namespace MealPlanner.Data.Repositories.Dapper
             using (var connection = new SqlConnection(this.connectionString))
             {
                 await connection.OpenAsync();
-                var query = @"select GroupId, Name, Secret, Created from Groups where GroupId = @groupId";
+                var query = @"select GroupId, Name, Secret, Created, RefreshToken from Groups where GroupId = @groupId";
                 var result = await connection.QueryAsync<Group>(query, new { groupId });
                 return result.FirstOrDefault();
             }

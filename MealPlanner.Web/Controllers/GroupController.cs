@@ -8,6 +8,7 @@ using Newtonsoft.Json.Linq;
 using System;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
+using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
 using TwoFactorAuthNet;
@@ -43,13 +44,17 @@ namespace MealPlanner.Web.Controllers
                     Secret = tfa.CreateSecret(160)
                 };
                 if (await this.groupRepository.Save(group) && group.GroupId.HasValue)
-                { 
+                {
                     var jwt = JoinGroupJwtBased(group);
+                    group.RefreshToken = GenerateRefreshToken();
+                    await this.groupRepository.Save(group);
+
                     return new JsonResult(new
                     {
                         name = group.Name,
                         qrCode = tfa.GetQrCodeImageAsDataUri(group.Name, group.Secret),
-                        token = jwt
+                        token = jwt,
+                        refreshToken = group.RefreshToken
                     });
 
                 }
@@ -68,11 +73,12 @@ namespace MealPlanner.Web.Controllers
         {
             var tokenHandler = new JwtSecurityTokenHandler();
             var key = Encoding.ASCII.GetBytes(configuration["jwtSecret"]);
-            var tokenDiscriptor = new SecurityTokenDescriptor {
+            var tokenDiscriptor = new SecurityTokenDescriptor
+            {
                 Subject = new ClaimsIdentity(new Claim[]{
                     new Claim("GroupId", group.GroupId.ToString())
                 }),
-                Expires = DateTime.UtcNow.AddDays(7),
+                Expires = DateTime.UtcNow.AddMinutes(1),
                 Audience = "MealPlanner",
                 SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha512Signature)
             };
@@ -81,7 +87,7 @@ namespace MealPlanner.Web.Controllers
             return tokenHandler.WriteToken(token);
         }
 
-        [Route("getValidationToken"), HttpGet] 
+        [Route("getValidationToken"), HttpGet]
         public async Task<IActionResult> GetValidationToken()
         {
             var groupId = this.GroupId();
@@ -111,11 +117,11 @@ namespace MealPlanner.Web.Controllers
                 return Ok("ok");
             }
             else
-            { 
-                return Ok("We konden de token niet valideren, probeer het opnieuw"); 
+            {
+                return Ok("We konden de token niet valideren, probeer het opnieuw");
             }
         }
-         
+
         [Route("join"), HttpPost]
         public async Task<IActionResult> JoinByName([FromBody] JObject payload)
         {
@@ -129,12 +135,16 @@ namespace MealPlanner.Web.Controllers
                     if (tfa.VerifyCode(group.Secret, payload.Property("token").Value.ToString()))
                     {
                         if (group != null && group.GroupId.HasValue)
-                        { 
+                        {
                             var jwt = JoinGroupJwtBased(group);
+                            group.RefreshToken = GenerateRefreshToken();
+                            await this.groupRepository.Save(group);
+
                             return new JsonResult(new
                             {
-                                name = group.Name, 
-                                token = jwt
+                                name = group.Name,
+                                token = jwt,
+                                refreshToken = group.RefreshToken
                             });
                         }
                     }
@@ -150,7 +160,64 @@ namespace MealPlanner.Web.Controllers
             }
 
             return Ok("Helaas kennen we deze groep niet");
-           
-        } 
+        }
+
+        [Route("refresh"), HttpPost]
+        public async Task<IActionResult> RefreshToken([FromBody] JObject payload)
+        {
+            var principal = GetPrincipalFromExpiredToken(payload.Property("token").Value.ToString());
+            var groupId = int.Parse((principal.Identity as ClaimsIdentity).FindFirst("GroupId").Value);
+            var group = await this.groupRepository.GetById(groupId);
+
+            var savedRefreshToken = group.RefreshToken;
+            if (savedRefreshToken != payload.Property("refreshToken").Value.ToString())
+                throw new SecurityTokenException("Invalid refresh token");
+
+            var jwt = JoinGroupJwtBased(group); 
+            group.RefreshToken = GenerateRefreshToken();
+            await this.groupRepository.Save(group);
+
+            return new JsonResult(new
+            {
+                name = group.Name,
+                token = jwt,
+                refreshToken = group.RefreshToken
+            });
+        }
+
+        private string GenerateRefreshToken()
+        {
+            var randomNumber = new byte[32];
+            using (var rng = RandomNumberGenerator.Create())
+            {
+                rng.GetBytes(randomNumber);
+                return Convert.ToBase64String(randomNumber);
+            }
+        }
+
+
+
+        private ClaimsPrincipal GetPrincipalFromExpiredToken(string token)
+        { 
+            var tokenValidationParameters = new TokenValidationParameters
+            {
+                ValidateIssuerSigningKey = true,
+                IssuerSigningKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(configuration["jwtSecret"])),
+                ValidateAudience = true,
+                ValidAudience = "MealPlanner",
+                ValidateIssuer = false,
+                ValidateLifetime = false,
+                ClockSkew = TimeSpan.Zero
+            };
+
+            var tokenHandler = new JwtSecurityTokenHandler();
+            SecurityToken securityToken;
+            var principal = tokenHandler.ValidateToken(token, tokenValidationParameters, out securityToken);
+            var jwtSecurityToken = securityToken as JwtSecurityToken;
+            if (jwtSecurityToken == null || !jwtSecurityToken.Header.Alg.Equals(SecurityAlgorithms.HmacSha512, StringComparison.InvariantCultureIgnoreCase))
+                throw new SecurityTokenException("Invalid token");
+
+            return principal;
+        }
     }
 }

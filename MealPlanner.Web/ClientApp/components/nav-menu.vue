@@ -6,7 +6,7 @@
              {{this.getGroupName()}}</i>
         <ul class="navbar-nav mr-auto" v-if="this.showMenu()">
             <li v-for="route in routes" class="nav-item ml-3"> 
-                <router-link v-if="!route.hideInMenu" :to="route.path" class="nav-link">
+                <router-link v-if="!route.meta.hideInMenu" :to="route.path" class="nav-link">
                     <span :class="route.style"></span> {{ route.display }}
                 </router-link>
             </li>

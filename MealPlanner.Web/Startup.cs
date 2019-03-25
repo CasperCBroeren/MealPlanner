@@ -12,8 +12,10 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
+using System;
 using System.Linq;
 using System.Text;
+using System.Threading.Tasks;
 using Umi.Core;
 
 namespace mealplanner
@@ -70,8 +72,25 @@ namespace mealplanner
                       ValidateAudience = true,
                       ValidAudience = "MealPlanner",
                       ValidateIssuer = false,
-                      ValidateLifetime = true
+                      ValidateLifetime = true,
+                      ClockSkew = TimeSpan.Zero
 
+                  };
+                  options.Events = new JwtBearerEvents
+                  {
+                      OnAuthenticationFailed = context =>
+                      {
+                          if (context.Exception.GetType() == typeof(SecurityTokenExpiredException))
+                          {
+                              context.Response.Headers.Add("TokenExpired", "true");
+                          }
+
+                          return Task.CompletedTask;
+                      },
+                      OnTokenValidated = context =>
+                      { 
+                          return Task.CompletedTask;
+                      }
                   };
               });
             services.AddAuthorization(options =>

@@ -12,5 +12,7 @@ namespace MealPlanner.Data.Models
         public DateTime Created { get; set; }
 
         public string Secret { get; set; }
+
+        public string RefreshToken { get; set; }
     }
 }
