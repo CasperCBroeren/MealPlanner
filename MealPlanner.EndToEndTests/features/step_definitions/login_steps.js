@@ -4,6 +4,9 @@ const {Builder, By, Key, until} = require('selenium-webdriver');
 const chrome = require('selenium-webdriver/chrome');
 const firefox = require('selenium-webdriver/firefox');
 const jsotp = require('jsotp');
+const util = require('util')
+const fs = require('fs')
+const writeFile = util.promisify(fs.writeFile)
 
 
 
@@ -11,7 +14,7 @@ const jsotp = require('jsotp');
     var opts = new firefox.Options();     
   //  opts.headless(true);
     this.driver = new Builder()
-	.forBrowser('firefox')
+	.forBrowser('chrome')
 	.usingServer('http://localhost:4444/wd/hub')
     //.setFirefoxOptions(opts)
     .build();
@@ -61,13 +64,14 @@ const jsotp = require('jsotp');
     await this.driver.quit();
   });
 
-  Then('I will see the dashboard with {string}', async function (expected) {
+   Then('I will see the dashboard with {string}', async function (expected) {
     await this.driver.wait(until.elementLocated(By.tagName("i")), 3000);
     var element = await this.driver.findElement(By.tagName('i'));
     assert.equal(await element.getText(), expected);
+    let image = await this.driver.takeScreenshot();
+    await writeFile('./output.png', image, 'base64'); 
     await this.driver.quit();
   });
-
   function clearLocalStorageItem(driver) {
     return driver.executeScript("localStorage.clear()");
   }
