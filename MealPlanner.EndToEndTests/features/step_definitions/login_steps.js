@@ -10,8 +10,10 @@ const jsotp = require('jsotp');
   Given('I\'m on the mealplanner website', async function () {
     var opts = new firefox.Options();     
   //  opts.headless(true);
-    this.driver = new Builder().forBrowser('firefox')
-    .setFirefoxOptions(opts)
+    this.driver = new Builder()
+	.forBrowser('firefox')
+	.usingServer('http://localhost:4444/wd/hub')
+    //.setFirefoxOptions(opts)
     .build();
     await this.driver.get('http://maaltijdplanner.azurewebsites.net');
   });
