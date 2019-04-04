@@ -1,13 +1,12 @@
 {
-  "name": "SeleniumTest",
+  "name": "MealplannerEnd2EndTests",
   "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "description": "Cucumber Gherkin selenium end-to-end test", 
   "scripts": {
-    "test": "cucumber-js"
+    "test-prod": "cucumber-js --world-parameters \"{\\\"mpUrl\\\": \\\"https://maaltijdplanner.azurewebsites.net/\\\"}\"" 
   },
   "keywords": [],
-  "author": "",
+  "author": "Casper Broeren",
   "license": "ISC",
   "devDependencies": {
     "cucumber": "^5.1.0"
