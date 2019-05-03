@@ -53,7 +53,10 @@ namespace mealplanner
             // Umi for urls
             services.AddUmi();
             // Add framework services.
-            services.AddMvc();
+            services.AddMvc().AddRazorPagesOptions(options =>
+           {
+               options.Conventions.AllowAnonymousToFolder("/dist");
+           }).SetCompatibilityVersion(Microsoft.AspNetCore.Mvc.CompatibilityVersion.Version_2_2);
 
             services.AddAuthentication(options =>
                {
